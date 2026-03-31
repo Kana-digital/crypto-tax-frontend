@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://crypto-tax-frontend.vercel.app/sitemap.xml
