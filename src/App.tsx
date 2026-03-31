@@ -117,6 +117,55 @@ function App() {
         </ol>
       </div>
 
+      {/* PR：おすすめ暗号資産取引所 */}
+      <div style={{ marginTop: 24, padding: "16px 18px", backgroundColor: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: "bold", color: "#374151" }}>おすすめ暗号資産取引所</p>
+          <span style={{ fontSize: 10, color: "#9ca3af", border: "1px solid #d1d5db", borderRadius: 3, padding: "2px 5px" }}>PR</span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+          {/* Coincheck */}
+          <a href="COINCHECK_AFFILIATE_URL" target="_blank" rel="noopener noreferrer sponsored"
+            style={{ display: "block", padding: "14px 10px", backgroundColor: "white", borderRadius: 6,
+              border: "1px solid #e2e8f0", textDecoration: "none", textAlign: "center",
+              transition: "box-shadow 0.15s", boxShadow: "none" }}
+            onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)")}
+            onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: "#00b9ae", margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>C</span>
+            </div>
+            <div style={{ fontSize: 13, fontWeight: "bold", color: "#1a202c", marginBottom: 4 }}>Coincheck</div>
+            <div style={{ fontSize: 11, color: "#6b7280", lineHeight: 1.5 }}>国内最大級<br/>口座開設無料</div>
+          </a>
+          {/* bitbank */}
+          <a href="BITBANK_AFFILIATE_URL" target="_blank" rel="noopener noreferrer sponsored"
+            style={{ display: "block", padding: "14px 10px", backgroundColor: "white", borderRadius: 6,
+              border: "1px solid #e2e8f0", textDecoration: "none", textAlign: "center",
+              transition: "box-shadow 0.15s", boxShadow: "none" }}
+            onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)")}
+            onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: "#1c2b4b", margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>B</span>
+            </div>
+            <div style={{ fontSize: 13, fontWeight: "bold", color: "#1a202c", marginBottom: 4 }}>bitbank</div>
+            <div style={{ fontSize: 11, color: "#6b7280", lineHeight: 1.5 }}>国内最多通貨<br/>充実のチャート</div>
+          </a>
+          {/* SBI VC Trade */}
+          <a href="SBIVC_AFFILIATE_URL" target="_blank" rel="noopener noreferrer sponsored"
+            style={{ display: "block", padding: "14px 10px", backgroundColor: "white", borderRadius: 6,
+              border: "1px solid #e2e8f0", textDecoration: "none", textAlign: "center",
+              transition: "box-shadow 0.15s", boxShadow: "none" }}
+            onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)")}
+            onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", backgroundColor: "#0057b7", margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ color: "white", fontSize: 14, fontWeight: "bold" }}>SBI</span>
+            </div>
+            <div style={{ fontSize: 13, fontWeight: "bold", color: "#1a202c", marginBottom: 4 }}>SBI VC Trade</div>
+            <div style={{ fontSize: 11, color: "#6b7280", lineHeight: 1.5 }}>SBIグループ運営<br/>安心・信頼</div>
+          </a>
+        </div>
+      </div>
+
       {result && (
         <div style={{ marginTop: 32 }}>
           <button
