@@ -344,6 +344,13 @@
   padding: 2px 6px;
 }
 
+.affiliate-disclosure {
+  font-size: 11px;
+  color: #6b7280;
+  margin: -4px 0 8px;
+  line-height: 1.5;
+}
+
 .affiliate-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

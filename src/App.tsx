@@ -248,8 +248,9 @@ function App() {
         <div className="affiliate-section">
           <div className="affiliate-header">
             <p className="affiliate-title">おすすめ暗号資産取引所</p>
-            <span className="pr-badge">PR</span>
+            <span className="pr-badge">広告（PR）</span>
           </div>
+          <p className="affiliate-disclosure">※本セクションはアフィリエイト広告を含みます。口座開設により報酬を受け取る場合があります。</p>
           <div className="affiliate-grid">
             <a
               href="COINCHECK_AFFILIATE_URL"
@@ -377,15 +378,8 @@ function App() {
         <div className="app-footer-inner">
           <div className="footer-links">
             <button className="footer-link" onClick={() => setShowPrivacy(true)}>
-              プライバシーポリシー
+              プライバシーポリシー・免責事項
             </button>
-            <a
-              className="footer-link"
-              href="https://crypto-tax-frontend.vercel.app/"
-              target="_self"
-            >
-              使い方
-            </a>
           </div>
           <p className="footer-copy">© 2026 暗号資産損益計算ツール. All rights reserved.</p>
         </div>
