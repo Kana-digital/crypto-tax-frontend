@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./App.css";
 
 // ==================== Privacy Policy Modal ====================
@@ -34,6 +34,89 @@ function PrivacyModal({ onClose }: { onClose: () => void }) {
         </div>
       </div>
     </div>
+  );
+}
+
+// ==================== Chat Support Widget ====================
+interface ChatMsg { role: "user" | "assistant"; content: string; }
+
+function ChatWidget() {
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState<ChatMsg[]>([
+    { role: "assistant", content: "こんにちは！使い方のご質問や不具合のご報告はこちらからどうぞ😊" }
+  ]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (open) bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, open]);
+
+  const send = async () => {
+    const text = input.trim();
+    if (!text || loading) return;
+    const newMessages: ChatMsg[] = [...messages, { role: "user", content: text }];
+    setMessages(newMessages);
+    setInput("");
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/chat`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: newMessages }),
+        }
+      );
+      const data = await res.json();
+      setMessages(prev => [...prev, { role: "assistant", content: data.reply || "応答を取得できませんでした。" }]);
+    } catch {
+      setMessages(prev => [...prev, { role: "assistant", content: "接続エラーが発生しました。しばらく待ってから再度お試しください。" }]);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <>
+      {open && (
+        <div className="chat-window">
+          <div className="chat-header">
+            <span>💬 サポート・不具合報告</span>
+            <button className="chat-close-btn" onClick={() => setOpen(false)}>✕</button>
+          </div>
+          <div className="chat-messages">
+            {messages.map((m, i) => (
+              <div key={i} className={`chat-bubble ${m.role}`}>
+                {m.content}
+              </div>
+            ))}
+            {loading && (
+              <div className="chat-bubble assistant">
+                <span className="chat-typing">●●●</span>
+              </div>
+            )}
+            <div ref={bottomRef} />
+          </div>
+          <div className="chat-input-row">
+            <input
+              className="chat-input"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && !e.shiftKey && send()}
+              placeholder="メッセージを入力..."
+              disabled={loading}
+            />
+            <button className="chat-send-btn" onClick={send} disabled={loading || !input.trim()}>
+              送信
+            </button>
+          </div>
+        </div>
+      )}
+      <button className="chat-fab" onClick={() => setOpen(o => !o)} aria-label="サポートチャット">
+        {open ? "✕" : "💬"}
+      </button>
+    </>
   );
 }
 
@@ -387,6 +470,9 @@ function App() {
 
       {/* Privacy Modal */}
       {showPrivacy && <PrivacyModal onClose={() => setShowPrivacy(false)} />}
+
+      {/* Chat Support Widget */}
+      <ChatWidget />
     </div>
   );
 }
