@@ -36,7 +36,7 @@ function App() {
     files.forEach(f => formData.append("files", f));
     formData.append("method", method);
     try {
-      const res = await fetch("${import.meta.env.VITE_API_URL || "http://localhost:8000"}/calculate", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/calculate`, {
         method: "POST",
         body: formData,
       });
