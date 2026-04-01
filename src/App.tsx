@@ -291,7 +291,7 @@ function ExchangeRequestSection() {
     <div className="exchange-request-section">
       <h3 className="exchange-request-title">🏦 対応取引所のリクエスト</h3>
       <p className="exchange-request-desc">
-        希望する取引所をリクエストできます。<strong>3人</strong>がリクエストした取引所は<strong>正式対応予定</strong>に追加されます。取引履歴CSVを添付していただけると実装がスムーズになります。
+        希望する取引所をリクエストできます。<strong>3人</strong>がリクエストした取引所は<strong>対応予定</strong>に追加されます。取引履歴CSVを添付していただけると実装がスムーズになります。
       </p>
 
       {submitted ? (
@@ -584,7 +584,7 @@ function App() {
         )}
 
         {/* Page Title */}
-        <h1 className="page-title">暗号資産の損益をかんたんにシュミレーション</h1>
+        <h1 className="page-title">暗号資産の損益をかんたんシュミレーション</h1>
         <p className="page-subtitle">取引履歴のCSVをアップロードすると、損益をシュミレーションできます</p>
         <p className="page-exchanges">対応取引所：Coincheck・SBI VC Trade・bitbank</p>
 
@@ -767,9 +767,15 @@ function App() {
             </div>
 
             {/* CSV Download */}
-            <button className="csv-btn" onClick={handleCSVDownload}>
-              📥 取引データをCSVで出力
-            </button>
+            {isPaid ? (
+              <button className="csv-btn" onClick={handleCSVDownload}>
+                📥 取引データをCSVで出力
+              </button>
+            ) : (
+              <button className="csv-btn" onClick={() => setShowAdModal(true)}>
+                📥 取引データをCSVで出力（有料プランで利用可能）
+              </button>
+            )}
 
             {/* Table */}
             <h2 className="result-section-title" style={{ marginTop: 8 }}>取引明細</h2>
