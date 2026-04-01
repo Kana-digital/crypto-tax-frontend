@@ -72,12 +72,12 @@ function AuthModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () 
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content auth-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <p className="modal-title">有料プランへのログイン</p>
+          <p className="modal-title">ログイン / 新規登録</p>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
         {signupDone ? (
           <div className="auth-signup-done">
-            <p>✅ 確認メールを送信しました。</p>
+            <p>確認メールを送信しました。</p>
             <p style={{ fontSize: 13, color: "#64748b", marginTop: 8 }}>メール内のリンクをクリックして登録を完了してください。</p>
           </div>
         ) : (
