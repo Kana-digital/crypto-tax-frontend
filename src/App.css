@@ -1132,6 +1132,44 @@
 }
 .header-logout-btn:hover { background: #f8fafc; }
 
+.header-upgrade-btn {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.header-upgrade-btn:hover { opacity: 0.85; }
+.header-upgrade-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.payment-success-banner {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 14px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.banner-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  opacity: 0.8;
+}
+.banner-close:hover { opacity: 1; }
+
 .auth-modal { max-width: 380px; }
 
 .auth-tabs {

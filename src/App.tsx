@@ -386,6 +386,8 @@ function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showAdModal, setShowAdModal] = useState(false);
   const [pendingResult, setPendingResult] = useState<any>(null);
+  const [upgradeLoading, setUpgradeLoading] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -411,6 +413,41 @@ function App() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
+
+  const handleUpgrade = async () => {
+    if (!user) { setShowAuthModal(true); return; }
+    setUpgradeLoading(true);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/create-checkout-session`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: user.id, email: user.email }),
+        }
+      );
+      const data = await res.json();
+      if (data.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else {
+        alert("決済ページの取得に失敗しました。しばらく待ってから再度お試しください。");
+      }
+    } catch {
+      alert("サーバーに接続できませんでした。");
+    }
+    setUpgradeLoading(false);
+  };
+
+  // 決済完了後のURLパラメータ処理
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("payment") === "success") {
+      setPaymentSuccess(true);
+      window.history.replaceState({}, "", "/");
+      // 有料ステータスを再取得
+      if (user) fetchPaidStatus(user.id);
+    }
+  }, [user]);
 
   const addFiles = (newFiles: FileList | null) => {
     if (!newFiles) return;
@@ -517,6 +554,15 @@ function App() {
             {user ? (
               <div className="header-user">
                 <span className="header-user-email">{isPaid ? "👑 有料プラン" : "無料プラン"}</span>
+                {!isPaid && (
+                  <button
+                    className="header-upgrade-btn"
+                    onClick={handleUpgrade}
+                    disabled={upgradeLoading}
+                  >
+                    {upgradeLoading ? "処理中..." : "⬆️ アップグレード"}
+                  </button>
+                )}
                 <button className="header-logout-btn" onClick={handleLogout}>ログアウト</button>
               </div>
             ) : (
@@ -529,6 +575,14 @@ function App() {
       </header>
 
       <main className="app-container">
+        {/* 決済成功バナー */}
+        {paymentSuccess && (
+          <div className="payment-success-banner">
+            🎉 有料プランへのアップグレードが完了しました！広告なしでご利用いただけます。
+            <button onClick={() => setPaymentSuccess(false)} className="banner-close">✕</button>
+          </div>
+        )}
+
         {/* Page Title */}
         <h1 className="page-title">暗号資産の損益を<br />かんたん計算</h1>
         <p className="page-subtitle">取引履歴CSVをアップロードするだけで損益を自動計算します</p>
