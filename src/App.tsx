@@ -131,9 +131,11 @@ function ExchangeRequestSection() {
   const [exchanges, setExchanges] = useState<ExchangeData[]>([]);
   const [newExchange, setNewExchange] = useState("");
   const [email, setEmail] = useState("");
+  const [csvFile, setCsvFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const csvInputRef = useRef<HTMLInputElement>(null);
 
   const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -156,10 +158,14 @@ function ExchangeRequestSection() {
     setSubmitting(true);
     setSubmitError("");
     try {
+      const formData = new FormData();
+      formData.append("exchange_name", newExchange.trim());
+      formData.append("email", email.trim());
+      if (csvFile) formData.append("csv_file", csvFile);
+
       const res = await fetch(`${API}/request-exchange`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ exchange_name: newExchange.trim(), email: email.trim() }),
+        body: formData,
       });
       if (!res.ok) {
         const data = await res.json();
@@ -168,6 +174,7 @@ function ExchangeRequestSection() {
         setSubmitted(true);
         setNewExchange("");
         setEmail("");
+        setCsvFile(null);
         fetchExchanges();
       }
     } catch {
@@ -180,7 +187,7 @@ function ExchangeRequestSection() {
     <div className="exchange-request-section">
       <h3 className="exchange-request-title">🏦 対応取引所のリクエスト</h3>
       <p className="exchange-request-desc">
-        希望する取引所をリクエストできます。<strong>3人</strong>がリクエストした取引所は<strong>正式対応予定</strong>に追加されます。
+        希望する取引所をリクエストできます。<strong>3人</strong>がリクエストした取引所は<strong>正式対応予定</strong>に追加されます。取引履歴CSVを添付していただけると実装がスムーズになります。
       </p>
 
       {submitted ? (
@@ -203,6 +210,29 @@ function ExchangeRequestSection() {
             value={email}
             onChange={e => setEmail(e.target.value)}
           />
+          {/* CSV添付 */}
+          <div className="exchange-csv-row">
+            <button
+              type="button"
+              className="exchange-csv-btn"
+              onClick={() => csvInputRef.current?.click()}
+            >
+              📎 取引履歴CSVを添付（任意）
+            </button>
+            {csvFile && (
+              <span className="exchange-csv-name">
+                {csvFile.name}
+                <button className="exchange-csv-remove" onClick={() => setCsvFile(null)}>×</button>
+              </span>
+            )}
+            <input
+              ref={csvInputRef}
+              type="file"
+              accept=".csv"
+              style={{ display: "none" }}
+              onChange={e => setCsvFile(e.target.files?.[0] || null)}
+            />
+          </div>
           {submitError && <p className="exchange-error">{submitError}</p>}
           <button className="exchange-submit-btn" onClick={handleSubmit} disabled={submitting}>
             {submitting ? "送信中..." : "リクエストする"}
