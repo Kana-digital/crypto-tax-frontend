@@ -586,6 +586,7 @@ function App() {
         {/* Page Title */}
         <h1 className="page-title">暗号資産の損益をかんたんシュミレーション</h1>
         <p className="page-subtitle">取引履歴のCSVをアップロードすると、損益をシュミレーションできます</p>
+        <p className="page-subtitle-paid">なお、有料プランに登録いただくと損益計算結果CSVを出力できます。損益計算結果CSVを取り込んで損益計算を行うことができます。また、有料プランには広告が表示されないため、ストレスフリーで作業できます。</p>
         <p className="page-exchanges">対応取引所：Coincheck・SBI VC Trade・bitbank</p>
 
         {/* Step 1: 計算方法 */}
