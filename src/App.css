@@ -912,3 +912,145 @@
     bottom: 16px;
   }
 }
+
+/* ==================== Exchange Request Section ==================== */
+.exchange-request-section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.exchange-request-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 8px;
+}
+
+.exchange-request-desc {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 16px;
+  line-height: 1.6;
+}
+
+.exchange-request-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.exchange-input {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #1e293b;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.exchange-input:focus { border-color: #2563eb; }
+
+.exchange-error {
+  font-size: 12px;
+  color: #dc2626;
+  margin: 0;
+}
+
+.exchange-submit-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.2s;
+}
+.exchange-submit-btn:hover:not(:disabled) { background: #1d4ed8; }
+.exchange-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.exchange-request-success {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: #16a34a;
+  font-weight: 500;
+  flex-wrap: wrap;
+}
+
+.exchange-again-btn {
+  background: none;
+  border: 1px solid #16a34a;
+  color: #16a34a;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.exchange-votes {
+  margin-top: 20px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 16px;
+}
+
+.exchange-votes-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 12px;
+}
+
+.exchange-vote-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.exchange-vote-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.exchange-vote-bar-wrap {
+  flex: 1;
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.exchange-vote-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.exchange-vote-count {
+  font-size: 12px;
+  color: #64748b;
+  min-width: 32px;
+  text-align: right;
+}
+
+.exchange-official-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  background: #16a34a;
+  border-radius: 4px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}

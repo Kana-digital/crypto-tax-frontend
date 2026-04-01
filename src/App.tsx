@@ -120,6 +120,121 @@ function ChatWidget() {
   );
 }
 
+// ==================== Exchange Request ====================
+interface ExchangeData {
+  exchange_name: string;
+  count: number;
+  is_official: boolean;
+}
+
+function ExchangeRequestSection() {
+  const [exchanges, setExchanges] = useState<ExchangeData[]>([]);
+  const [newExchange, setNewExchange] = useState("");
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+
+  const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+  const fetchExchanges = () => {
+    fetch(`${API}/exchange-requests`)
+      .then(r => r.json())
+      .then(data => setExchanges(data.exchanges || []))
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchExchanges();
+  }, []);
+
+  const handleSubmit = async () => {
+    if (!newExchange.trim() || !email.trim()) {
+      setSubmitError("取引所名とメールアドレスを入力してください");
+      return;
+    }
+    setSubmitting(true);
+    setSubmitError("");
+    try {
+      const res = await fetch(`${API}/request-exchange`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ exchange_name: newExchange.trim(), email: email.trim() }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setSubmitError(data.detail || "送信に失敗しました");
+      } else {
+        setSubmitted(true);
+        setNewExchange("");
+        setEmail("");
+        fetchExchanges();
+      }
+    } catch {
+      setSubmitError("通信エラーが発生しました。しばらく待ってから再度お試しください。");
+    }
+    setSubmitting(false);
+  };
+
+  return (
+    <div className="exchange-request-section">
+      <h3 className="exchange-request-title">🏦 対応取引所のリクエスト</h3>
+      <p className="exchange-request-desc">
+        希望する取引所をリクエストできます。<strong>3人</strong>がリクエストした取引所は<strong>正式対応予定</strong>に追加されます。
+      </p>
+
+      {submitted ? (
+        <div className="exchange-request-success">
+          ✅ リクエストを受け付けました！ありがとうございます。
+          <button className="exchange-again-btn" onClick={() => setSubmitted(false)}>別の取引所もリクエスト</button>
+        </div>
+      ) : (
+        <div className="exchange-request-form">
+          <input
+            className="exchange-input"
+            placeholder="取引所名（例：GMOコイン）"
+            value={newExchange}
+            onChange={e => setNewExchange(e.target.value)}
+          />
+          <input
+            className="exchange-input"
+            type="email"
+            placeholder="メールアドレス（重複投票防止用・非公開）"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
+          {submitError && <p className="exchange-error">{submitError}</p>}
+          <button className="exchange-submit-btn" onClick={handleSubmit} disabled={submitting}>
+            {submitting ? "送信中..." : "リクエストする"}
+          </button>
+        </div>
+      )}
+
+      {exchanges.length > 0 && (
+        <div className="exchange-votes">
+          <p className="exchange-votes-title">現在のリクエスト状況</p>
+          {exchanges.map(ex => (
+            <div key={ex.exchange_name} className="exchange-vote-row">
+              <span className="exchange-vote-name">{ex.exchange_name}</span>
+              <div className="exchange-vote-bar-wrap">
+                <div
+                  className="exchange-vote-bar"
+                  style={{
+                    width: `${Math.min(100, (ex.count / 3) * 100)}%`,
+                    background: ex.is_official ? "#16a34a" : "#2563eb",
+                  }}
+                />
+              </div>
+              <span className="exchange-vote-count">{ex.count}/3</span>
+              {ex.is_official && <span className="exchange-official-badge">実装予定✓</span>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ==================== Main App ====================
 function App() {
   const [method, setMethod] = useState("total_average");
@@ -373,6 +488,9 @@ function App() {
             </a>
           </div>
         </div>
+
+        {/* Exchange Request */}
+        <ExchangeRequestSection />
 
         {/* Result */}
         {result && (
