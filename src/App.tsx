@@ -584,8 +584,8 @@ function App() {
         )}
 
         {/* Page Title */}
-        <h1 className="page-title">暗号資産の損益を<br />かんたん計算</h1>
-        <p className="page-subtitle">取引履歴CSVをアップロードするだけで損益を自動計算します</p>
+        <h1 className="page-title">暗号資産の損益をかんたんにシュミレーション</h1>
+        <p className="page-subtitle">取引履歴のCSVをアップロードすると、損益をシュミレーションできます</p>
         <p className="page-exchanges">対応取引所：Coincheck・SBI VC Trade・bitbank</p>
 
         {/* Step 1: 計算方法 */}
@@ -597,14 +597,9 @@ function App() {
             value={method}
             onChange={e => setMethod(e.target.value)}
           >
-            <option value="total_average">総平均法（一般的な方法）</option>
+            <option value="total_average">総平均法</option>
             <option value="moving_average">移動平均法</option>
           </select>
-          <p className="method-hint">
-            {method === "total_average"
-              ? "年間を通じた平均取得単価で計算します。確定申告でよく使われる方法です。"
-              : "取引のたびに平均取得単価を更新する方法です。"}
-          </p>
         </div>
 
         {/* Step 2: ファイルアップロード */}
