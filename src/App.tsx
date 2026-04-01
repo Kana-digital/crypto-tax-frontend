@@ -1,5 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import "./App.css";
+import { createClient, type User } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL as string,
+  import.meta.env.VITE_SUPABASE_ANON_KEY as string
+);
 
 // ==================== Privacy Policy Modal ====================
 function PrivacyModal({ onClose }: { onClose: () => void }) {
@@ -32,6 +38,104 @@ function PrivacyModal({ onClose }: { onClose: () => void }) {
 
           <p className="modal-updated">最終更新日：2026年4月1日</p>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ==================== Auth Modal ====================
+function AuthModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+  const [tab, setTab] = useState<"login" | "signup">("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [signupDone, setSignupDone] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!email || !password) { setError("メールアドレスとパスワードを入力してください"); return; }
+    if (password.length < 6) { setError("パスワードは6文字以上にしてください"); return; }
+    setLoading(true); setError("");
+    if (tab === "login") {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) { setError("メールアドレスまたはパスワードが正しくありません"); }
+      else { onSuccess(); onClose(); }
+    } else {
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) { setError(error.message.includes("already") ? "このメールアドレスは既に登録されています" : "登録に失敗しました"); }
+      else { setSignupDone(true); }
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content auth-modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <p className="modal-title">有料プランへのログイン</p>
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </div>
+        {signupDone ? (
+          <div className="auth-signup-done">
+            <p>✅ 確認メールを送信しました。</p>
+            <p style={{ fontSize: 13, color: "#64748b", marginTop: 8 }}>メール内のリンクをクリックして登録を完了してください。</p>
+          </div>
+        ) : (
+          <div className="modal-body">
+            <div className="auth-tabs">
+              <button className={`auth-tab ${tab === "login" ? "active" : ""}`} onClick={() => { setTab("login"); setError(""); }}>ログイン</button>
+              <button className={`auth-tab ${tab === "signup" ? "active" : ""}`} onClick={() => { setTab("signup"); setError(""); }}>新規登録</button>
+            </div>
+            <div className="auth-form">
+              <input className="exchange-input" type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
+              <input className="exchange-input" type="password" placeholder="パスワード（6文字以上）" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSubmit()} />
+              {error && <p className="exchange-error">{error}</p>}
+              <button className="exchange-submit-btn" style={{ width: "100%" }} onClick={handleSubmit} disabled={loading}>
+                {loading ? "処理中..." : tab === "login" ? "ログイン" : "登録する"}
+              </button>
+            </div>
+            {tab === "login" && (
+              <p style={{ fontSize: 12, color: "#94a3b8", textAlign: "center", marginTop: 12 }}>
+                有料プランに登録すると広告なしでご利用いただけます
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ==================== Ad Countdown Modal ====================
+function AdCountdownModal({ onDone }: { onDone: () => void }) {
+  const [count, setCount] = useState(10);
+
+  useEffect(() => {
+    if (count <= 0) { onDone(); return; }
+    const t = setTimeout(() => setCount(c => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [count]);
+
+  return (
+    <div className="modal-overlay" style={{ zIndex: 200 }}>
+      <div className="ad-modal">
+        <p className="ad-modal-label">広告</p>
+        <div className="ad-placeholder">
+          {/* Google AdSense 広告ユニットをここに配置予定 */}
+          <p style={{ color: "#94a3b8", fontSize: 13 }}>広告スペース</p>
+        </div>
+        <div className="ad-countdown-row">
+          {count > 0 ? (
+            <span className="ad-countdown-text">{count}秒後にスキップできます</span>
+          ) : (
+            <button className="ad-skip-btn" onClick={onDone}>結果を見る →</button>
+          )}
+        </div>
+        <p style={{ fontSize: 11, color: "#94a3b8", textAlign: "center", marginTop: 8 }}>
+          <button className="footer-link" style={{ fontSize: 11 }} onClick={onDone}>
+            有料プランに登録すると広告なしで利用できます
+          </button>
+        </p>
       </div>
     </div>
   );
@@ -276,6 +380,38 @@ function App() {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Auth
+  const [user, setUser] = useState<User | null>(null);
+  const [isPaid, setIsPaid] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showAdModal, setShowAdModal] = useState(false);
+  const [pendingResult, setPendingResult] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) fetchPaidStatus(session.user.id);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) fetchPaidStatus(session.user.id);
+      else setIsPaid(false);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchPaidStatus = async (userId: string) => {
+    const { data } = await supabase.from("user_profiles").select("is_paid, paid_until").eq("id", userId).single();
+    if (data) {
+      const validUntil = data.paid_until ? new Date(data.paid_until) > new Date() : false;
+      setIsPaid(data.is_paid && validUntil);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
   const addFiles = (newFiles: FileList | null) => {
     if (!newFiles) return;
     setFiles(prev => {
@@ -318,11 +454,17 @@ function App() {
       if (!res.ok) {
         setError(data.detail || "計算中にエラーが発生しました。CSVのフォーマットを確認してください。");
       } else {
-        setResult(data);
-        // 結果までスクロール
-        setTimeout(() => {
-          document.getElementById("result-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 100);
+        if (user && isPaid) {
+          // 有料ユーザー：即座に結果表示
+          setResult(data);
+          setTimeout(() => {
+            document.getElementById("result-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 100);
+        } else {
+          // 無料ユーザー：広告を見てから結果表示
+          setPendingResult(data);
+          setShowAdModal(true);
+        }
       }
     } catch {
       setError("サーバーに接続できませんでした。しばらく待ってから再度お試しください。");
@@ -371,6 +513,18 @@ function App() {
           <div className="app-header-logo">₿</div>
           <span className="app-header-title">暗号資産損益計算ツール</span>
           <span className="app-header-badge">無料</span>
+          <div style={{ marginLeft: "auto" }}>
+            {user ? (
+              <div className="header-user">
+                <span className="header-user-email">{isPaid ? "👑 有料プラン" : "無料プラン"}</span>
+                <button className="header-logout-btn" onClick={handleLogout}>ログアウト</button>
+              </div>
+            ) : (
+              <button className="header-login-btn" onClick={() => setShowAuthModal(true)}>
+                有料プランへ登録
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -618,6 +772,28 @@ function App() {
 
       {/* Privacy Modal */}
       {showPrivacy && <PrivacyModal onClose={() => setShowPrivacy(false)} />}
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => setShowAuthModal(false)}
+        />
+      )}
+
+      {/* Ad Countdown Modal */}
+      {showAdModal && (
+        <AdCountdownModal
+          onDone={() => {
+            setShowAdModal(false);
+            setResult(pendingResult);
+            setPendingResult(null);
+            setTimeout(() => {
+              document.getElementById("result-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 100);
+          }}
+        />
+      )}
 
       {/* Chat Support Widget */}
       <ChatWidget />

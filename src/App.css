@@ -1096,3 +1096,130 @@
   padding: 0;
 }
 .exchange-csv-remove:hover { color: #dc2626; }
+
+/* ==================== Auth ==================== */
+.header-login-btn {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.header-login-btn:hover { opacity: 0.85; }
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header-user-email {
+  font-size: 12px;
+  color: #475569;
+  font-weight: 600;
+}
+.header-logout-btn {
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: #64748b;
+  cursor: pointer;
+}
+.header-logout-btn:hover { background: #f8fafc; }
+
+.auth-modal { max-width: 380px; }
+
+.auth-tabs {
+  display: flex;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 16px;
+}
+.auth-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #94a3b8;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+.auth-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+
+.auth-form { display: flex; flex-direction: column; gap: 10px; }
+
+.auth-signup-done {
+  text-align: center;
+  padding: 20px;
+  color: #16a34a;
+  font-weight: 600;
+}
+
+/* ==================== Ad Countdown ==================== */
+.ad-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  width: 340px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+.ad-modal-label {
+  font-size: 11px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+  align-self: flex-start;
+}
+
+.ad-placeholder {
+  width: 100%;
+  height: 200px;
+  background: #f1f5f9;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ad-countdown-row {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ad-countdown-text {
+  font-size: 13px;
+  color: #64748b;
+  background: #f1f5f9;
+  border-radius: 20px;
+  padding: 6px 14px;
+}
+
+.ad-skip-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
