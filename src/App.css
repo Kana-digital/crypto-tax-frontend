@@ -69,6 +69,12 @@
   font-weight: 600;
 }
 
+.badge-premium {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  border-color: #fbbf24;
+}
+
 /* --- Page Title --- */
 .page-title {
   font-size: 22px !important;
@@ -524,6 +530,18 @@
 .csv-btn:hover {
   background: #dcfce7;
   border-color: #4ade80;
+}
+
+.csv-btn-locked {
+  background: #f1f5f9;
+  color: #64748b;
+  border-color: #cbd5e1;
+}
+
+.csv-btn-locked:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  color: #475569;
 }
 
 /* --- Table --- */

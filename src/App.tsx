@@ -421,12 +421,15 @@ function App() {
     if (!user) { setShowAuthModal(true); return; }
     setUpgradeLoading(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch(
         `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/create-checkout-session`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_id: user.id, email: user.email }),
+          headers: {
+            "Content-Type": "application/json",
+            ...(session?.access_token ? { "Authorization": `Bearer ${session.access_token}` } : {}),
+          },
         }
       );
       const data = await res.json();
@@ -486,17 +489,26 @@ function App() {
     files.forEach(f => formData.append("files", f));
     formData.append("method", method);
     try {
+      // 認証トークンがあればヘッダーに付与（バックエンドでshow_ad判定に使用）
+      const headers: Record<string, string> = {};
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
       const res = await fetch(
         `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/calculate`,
-        { method: "POST", body: formData }
+        { method: "POST", body: formData, headers }
       );
       const data = await res.json();
       if (!res.ok) {
         setError(data.detail || "計算中にエラーが発生しました。CSVのフォーマットを確認してください。");
       } else {
-        if (user && isPaid) {
+        // バックエンドのshow_adフラグで広告表示を判定
+        if (data.show_ad === false) {
           // 有料ユーザー：即座に結果表示
           setResult(data);
+          setIsPaid(true);
           setTimeout(() => {
             document.getElementById("result-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
           }, 100);
@@ -525,6 +537,10 @@ function App() {
   }
 
   const handleCSVDownload = () => {
+    if (!isPaid) {
+      alert("取引データのCSV出力は有料プラン（年間980円）の機能です。アップグレードしてご利用ください。");
+      return;
+    }
     const header = "取引日時,取引所,売買,通貨,数量,単価(円),手数料";
     const rows = result.raw_trades.map((t: any) =>
       `${t.datetime},${t.exchange},${t.action},${t.currency},${t.amount},${t.price},${t.fee}`
@@ -537,6 +553,45 @@ function App() {
     a.download = "取引データ.csv";
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handlePDFDownload = async () => {
+    if (!isPaid) {
+      alert("PDF出力は有料プラン（年間980円）の機能です。アップグレードしてご利用ください。");
+      return;
+    }
+    if (files.length === 0) return;
+    setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const formData = new FormData();
+      files.forEach(f => formData.append("files", f));
+      formData.append("method", method);
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/calculate/pdf`,
+        {
+          method: "POST",
+          body: formData,
+          headers: session?.access_token ? { "Authorization": `Bearer ${session.access_token}` } : {},
+        }
+      );
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.detail || "PDF出力に失敗しました。");
+      } else {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "crypto_tax_report.pdf";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch {
+      alert("サーバーに接続できませんでした。");
+    }
+    setLoading(false);
   };
 
   const EXCHANGE_LABELS: Record<string, string> = {
@@ -552,7 +607,7 @@ function App() {
         <div className="app-header-inner">
           <div className="app-header-logo">₿</div>
           <span className="app-header-title">暗号資産損益計算ツール</span>
-          <span className="app-header-badge">無料</span>
+          <span className={`app-header-badge${isPaid ? " badge-premium" : ""}`}>{isPaid ? "Premium" : "無料"}</span>
           <div style={{ marginLeft: "auto" }}>
             {user ? (
               <div className="header-user">
@@ -770,16 +825,28 @@ function App() {
               </div>
             </div>
 
-            {/* CSV Download */}
-            {isPaid ? (
-              <button className="csv-btn" onClick={handleCSVDownload}>
-                📥 取引データをCSVで出力
-              </button>
-            ) : (
-              <button className="csv-btn" onClick={() => setShowAdModal(true)}>
-                📥 取引データをCSVで出力（有料プランで利用可能）
-              </button>
-            )}
+            {/* Download Buttons */}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "12px 0" }}>
+              {isPaid ? (
+                <>
+                  <button className="csv-btn" onClick={handleCSVDownload}>
+                    📥 取引データをCSVで出力
+                  </button>
+                  <button className="csv-btn" onClick={handlePDFDownload} disabled={loading}>
+                    📄 損益計算書をPDFで出力
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button className="csv-btn csv-btn-locked" onClick={handleUpgrade}>
+                    🔒 取引データをCSVで出力（有料プラン）
+                  </button>
+                  <button className="csv-btn csv-btn-locked" onClick={handleUpgrade}>
+                    🔒 損益計算書をPDFで出力（有料プラン）
+                  </button>
+                </>
+              )}
+            </div>
 
             {/* Table */}
             <h2 className="result-section-title" style={{ marginTop: 8 }}>取引明細</h2>
