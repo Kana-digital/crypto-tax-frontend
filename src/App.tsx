@@ -54,29 +54,43 @@ function PrivacyModal({ onClose }: { onClose: () => void }) {
 }
 
 // ==================== Auth Modal ====================
-function AuthModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void; onSuccess: () => void; onSignupAndPay: () => void }) {
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [signupDone, setSignupDone] = useState(false);
+
+  const validatePassword = (pw: string): string | null => {
+    if (pw.length < 8) return "パスワードは8文字以上にしてください";
+    if (!/[a-zA-Z]/.test(pw)) return "パスワードに英字を含めてください";
+    if (!/[0-9]/.test(pw)) return "パスワードに数字を含めてください";
+    return null;
+  };
 
   const handleSubmit = async () => {
     if (!email || !password) { setError("メールアドレスとパスワードを入力してください"); return; }
-    if (password.length < 6) { setError("パスワードは6文字以上にしてください"); return; }
+    const pwError = validatePassword(password);
+    if (pwError) { setError(pwError); return; }
     setLoading(true); setError("");
     if (tab === "login") {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) { setError("メールアドレスまたはパスワードが正しくありません"); }
       else { onSuccess(); onClose(); }
     } else {
+      if (password !== passwordConfirm) { setError("パスワードが一致しません"); setLoading(false); return; }
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) { setError(error.message.includes("already") ? "このメールアドレスは既に登録されています" : "登録に失敗しました"); }
       else if (data.user && data.user.identities && data.user.identities.length === 0) {
         setError("このメールアドレスは既に登録されています。ログインタブからログインしてください。");
       }
-      else { setSignupDone(true); }
+      else {
+        // アカウント作成成功 → 決済ページへ遷移
+        onSuccess();
+        onClose();
+        onSignupAndPay();
+      }
     }
     setLoading(false);
   };
@@ -85,35 +99,36 @@ function AuthModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () 
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content auth-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <p className="modal-title">ログイン / 新規登録</p>
+          <p className="modal-title">{tab === "login" ? "ログイン" : "有料プラン登録（年間980円）"}</p>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
-        {signupDone ? (
-          <div className="auth-signup-done">
-            <p>確認メールを送信しました。</p>
-            <p style={{ fontSize: 13, color: "#64748b", marginTop: 8 }}>メール内のリンクをクリックして登録を完了してください。</p>
+        <div className="modal-body">
+          <div className="auth-tabs">
+            <button className={`auth-tab ${tab === "login" ? "active" : ""}`} onClick={() => { setTab("login"); setError(""); }}>ログイン</button>
+            <button className={`auth-tab ${tab === "signup" ? "active" : ""}`} onClick={() => { setTab("signup"); setError(""); }}>新規登録</button>
           </div>
-        ) : (
-          <div className="modal-body">
-            <div className="auth-tabs">
-              <button className={`auth-tab ${tab === "login" ? "active" : ""}`} onClick={() => { setTab("login"); setError(""); }}>ログイン</button>
-              <button className={`auth-tab ${tab === "signup" ? "active" : ""}`} onClick={() => { setTab("signup"); setError(""); }}>新規登録</button>
-            </div>
-            <div className="auth-form">
-              <input className="exchange-input" type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
-              <input className="exchange-input" type="password" placeholder="パスワード（6文字以上）" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSubmit()} />
-              {error && <p className="exchange-error">{error}</p>}
-              <button className="exchange-submit-btn" style={{ width: "100%" }} onClick={handleSubmit} disabled={loading}>
-                {loading ? "処理中..." : tab === "login" ? "ログイン" : "登録する"}
-              </button>
-            </div>
-            {tab === "login" && (
-              <p style={{ fontSize: 12, color: "#94a3b8", textAlign: "center", marginTop: 12 }}>
-                有料プランに登録すると広告なしでご利用いただけます
-              </p>
+          <div className="auth-form">
+            <input className="exchange-input" type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
+            <input className="exchange-input" type="password" placeholder="パスワード（英数字8文字以上）" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSubmit()} />
+            {tab === "signup" && (
+              <input className="exchange-input" type="password" placeholder="パスワード（確認用）" value={passwordConfirm} onChange={e => setPasswordConfirm(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSubmit()} />
             )}
+            {error && <p className="exchange-error">{error}</p>}
+            <button className="exchange-submit-btn" style={{ width: "100%" }} onClick={handleSubmit} disabled={loading}>
+              {loading ? "処理中..." : tab === "login" ? "ログイン" : "決済に進む"}
+            </button>
           </div>
-        )}
+          {tab === "signup" && (
+            <p style={{ fontSize: 12, color: "#64748b", textAlign: "center", marginTop: 12 }}>
+              アカウント作成後、決済ページに移動します
+            </p>
+          )}
+          {tab === "login" && (
+            <p style={{ fontSize: 12, color: "#94a3b8", textAlign: "center", marginTop: 12 }}>
+              有料プランに登録すると広告なしでご利用いただけます
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -446,17 +461,17 @@ function App() {
   };
 
   const handleUpgrade = async () => {
-    if (!user) { setShowAuthModal(true); return; }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { setShowAuthModal(true); return; }
     setUpgradeLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch(
         `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/create-checkout-session`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...(session?.access_token ? { "Authorization": `Bearer ${session.access_token}` } : {}),
+            "Authorization": `Bearer ${session.access_token}`,
           },
         }
       );
@@ -932,6 +947,7 @@ function App() {
         <AuthModal
           onClose={() => setShowAuthModal(false)}
           onSuccess={() => setShowAuthModal(false)}
+          onSignupAndPay={handleUpgrade}
         />
       )}
 
