@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import "./App.css";
 import { createClient, type User } from "@supabase/supabase-js";
 
-// Google AdSense ã®åå®ç¾©
+// Google AdSense の型定義
 declare global {
   interface Window {
     adsbygoogle: unknown[];
@@ -20,33 +20,33 @@ function PrivacyModal({ onClose }: { onClose: () => void }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <p className="modal-title">ãã©ã¤ãã·ã¼ããªã·ã¼</p>
-          <button className="modal-close" onClick={onClose} aria-label="éãã">â</button>
+          <p className="modal-title">プライバシーポリシー</p>
+          <button className="modal-close" onClick={onClose} aria-label="閉じる">✕</button>
         </div>
         <div className="modal-body">
-          <h3>1. åºæ¬æ¹é</h3>
-          <p>æ¬ãµã¼ãã¹ã¯ãå©ç¨èã®ãã©ã¤ãã·ã¼ãå°éããåäººæå ±ã®ä¿è­·ã«åªãã¾ããæ¬ãµã¼ãã¹ã¯æå·è³ç£ã®æçè¨ç®ãè¡ãç¡æãµã¼ãã¹ã§ãã</p>
+          <h3>1. 基本方針</h3>
+          <p>本サービスは、利用者のプライバシーを尊重し、個人情報の保護に努めます。本サービスは暗号資産の損益計算を行う無料サービスです。</p>
 
-          <h3>2. ã¢ããã­ã¼ããã¼ã¿ã®åãæ±ã</h3>
-          <p>å©ç¨èãã¢ããã­ã¼ãããCSVãã¡ã¤ã«ã¯ãæçè¨ç®ã®å¦çã®ã¿ã«ä½¿ç¨ããã¾ããã¢ããã­ã¼ãããããã¼ã¿ã¯ãµã¼ãã¼ã«ä¿å­ããããå¦çå®äºå¾ã«å³åº§ã«ç ´æ£ããã¾ããæ¬ãµã¼ãã¹ã¯ãå®¢æ§ã®åå¼ãã¼ã¿ãåéã»ä¿ç®¡ã»ç¬¬ä¸èæä¾ãã¾ããã</p>
+          <h3>2. アップロードデータの取り扱い</h3>
+          <p>利用者がアップロードするCSVファイルは、損益計算の処理のみに使用されます。アップロードされたデータはサーバーに保存されず、処理完了後に即座に破棄されます。本サービスはお客様の取引データを収集・保管・第三者提供しません。</p>
 
-          <h3>3. ã¢ã¯ã»ã¹è§£æãã¼ã«ï¼Google Analyticsï¼</h3>
-          <p>æ¬ãµã¼ãã¹ã¯ãµã¼ãã¹æ¹åã®ãããGoogle Analyticsï¼GA4ï¼ãä½¿ç¨ãã¦ãã¾ããGoogle Analyticsã¯ãã©ãã£ãã¯ãã¼ã¿ã®åéã®ããã«Cookieãä½¿ç¨ãã¦ããããã®ãã¼ã¿ã¯å¿åã§åéããã¾ããåäººãç¹å®ããæå ±ã¯å«ã¾ãã¾ããã</p>
-          <p>Cookieã®ä½¿ç¨ãæã¾ãªãå ´åã¯ããã©ã¦ã¶ã®è¨­å®ããCookieãç¡å¹ã«ãããã¨ãã§ãã¾ããè©³ç´°ã¯ <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={{color: "#2563eb"}}>Googleã®ãã©ã¤ãã·ã¼ããªã·ã¼</a> ããç¢ºèªãã ããã</p>
+          <h3>3. アクセス解析ツール（Google Analytics）</h3>
+          <p>本サービスはサービス改善のため、Google Analytics（GA4）を使用しています。Google Analyticsはトラフィックデータの収集のためにCookieを使用しており、このデータは匿名で収集されます。個人を特定する情報は含まれません。</p>
+          <p>Cookieの使用を望まない場合は、ブラウザの設定からCookieを無効にすることができます。詳細は <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={{color: "#2563eb"}}>Googleのプライバシーポリシー</a> をご確認ください。</p>
 
-          <h3>4. åºåã»ã¢ãã£ãªã¨ã¤ããªã³ã¯ã«ã¤ãã¦</h3>
-          <p>æ¬ãµã¼ãã¹ã§ã¯ãæå·è³ç£åå¼æã¸ã®ã¢ãã£ãªã¨ã¤ããªã³ã¯ãæ²è¼ãã¦ãã¾ãï¼ãPRãã¨è¡¨ç¤ºï¼ãã¢ãã£ãªã¨ã¤ããªã³ã¯ãçµç±ãã¦å£åº§éè¨­ãè¡ãããå ´åãæ¬ãµã¼ãã¹ã«å ±é¬ãæ¯æããããã¨ãããã¾ããå©ç¨èããªã³ã¯ãã¯ãªãã¯ããå ´åãååå¼æã®ãã©ã¤ãã·ã¼ããªã·ã¼ãé©ç¨ããã¾ãã</p>
+          <h3>4. 広告・アフィリエイトリンクについて</h3>
+          <p>本サービスでは、暗号資産取引所へのアフィリエイトリンクを掲載しています（「PR」と表示）。アフィリエイトリンクを経由して口座開設が行われた場合、本サービスに報酬が支払われることがあります。利用者がリンクをクリックした場合、各取引所のプライバシーポリシーが適用されます。</p>
 
-          <h3>5. ææãã©ã³ã¨æ±ºæ¸ã«ã¤ãã¦</h3>
-          <p>æ¬ãµã¼ãã¹ã§ã¯ææãã©ã³ãæä¾ãã¦ãã¾ããæ±ºæ¸å¦çã¯Stripe, Inc.ãæä¾ããæ±ºæ¸ãµã¼ãã¹ãå©ç¨ãã¦ãããã¯ã¬ã¸ããã«ã¼ãæå ±ç­ã®æ±ºæ¸æå ±ã¯æ¬ãµã¼ãã¹ã§ã¯ä¸åä¿ç®¡ãã¾ãããæ±ºæ¸ã«é¢ããæå ±ã¯Stripeã®ãã©ã¤ãã·ã¼ããªã·ã¼ã«åºã¥ãã¦ç®¡çããã¾ããææãã©ã³ã®å å¥ç¶æ³ã¯æ¬ãµã¼ãã¹ã®ãã¼ã¿ãã¼ã¹ä¸ã§ç®¡çãã¾ãã</p>
+          <h3>5. 有料プランと決済について</h3>
+          <p>本サービスでは有料プランを提供しています。決済処理はStripe, Inc.が提供する決済サービスを利用しており、クレジットカード情報等の決済情報は本サービスでは一切保管しません。決済に関する情報はStripeのプライバシーポリシーに基づいて管理されます。有料プランの加入状況は本サービスのデータベース上で管理します。</p>
 
-          <h3>6. åè²¬äºé </h3>
-          <p>æ¬ãµã¼ãã¹ã®è¨ç®çµæã¯åèå¤ã§ãããç¨åç³åç­ã®æ­£å¼ãªæ¸é¡ã¨ãã¦ãã®ã¾ã¾ä½¿ç¨ãããã¨ã¯ã§ãã¾ãããè¨ç®çµæã®æ­£ç¢ºæ§ã«ã¤ãã¦æ¬ãµã¼ãã¹ã¯ä¸åã®è²¬ä»»ãè² ãã¾ãããç¢ºå®ç³åã«ã¤ãã¦ã¯ç¨åç½²ã¾ãã¯ç¨çå£«ã«ãç¸è«ãã ããã</p>
+          <h3>6. 免責事項</h3>
+          <p>本サービスの計算結果は参考値であり、税務申告等の正式な書類としてそのまま使用することはできません。計算結果の正確性について本サービスは一切の責任を負いません。確定申告については税務署または税理士にご相談ください。</p>
 
-          <h3>7. ãã©ã¤ãã·ã¼ããªã·ã¼ã®å¤æ´</h3>
-          <p>æ¬ãµã¼ãã¹ã¯ãå¿è¦ã«å¿ãã¦æ¬ãã©ã¤ãã·ã¼ããªã·ã¼ãå¤æ´ãããã¨ãããã¾ããå¤æ´å¾ã®ããªã·ã¼ã¯æ¬ãã¼ã¸ã«æ²è¼ããæç¹ããå¹åãçãã¾ãã</p>
+          <h3>7. プライバシーポリシーの変更</h3>
+          <p>本サービスは、必要に応じて本プライバシーポリシーを変更することがあります。変更後のポリシーは本ページに掲載した時点から効力を生じます。</p>
 
-          <p className="modal-updated">æçµæ´æ°æ¥ï¼2026å¹´4æ1æ¥</p>
+          <p className="modal-updated">最終更新日：2026年4月1日</p>
         </div>
       </div>
     </div>
@@ -62,17 +62,17 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
   const [error, setError] = useState("");
 
   const handleLogin = async () => {
-    if (!email || !password) { setError("ã¡ã¼ã«ã¢ãã¬ã¹ã¨ãã¹ã¯ã¼ããå¥åãã¦ãã ãã"); return; }
+    if (!email || !password) { setError("メールアドレスとパスワードを入力してください"); return; }
     setLoading(true); setError("");
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) { setError("ã¡ã¼ã«ã¢ãã¬ã¹ã¾ãã¯ãã¹ã¯ã¼ããæ­£ããããã¾ãã"); }
+    if (error) { setError("メールアドレスまたはパスワードが正しくありません"); }
     else {
-      // ã­ã°ã¤ã³æå â ææä¼å¡ããã§ãã¯
+      // ログイン成功 → 有料会員かチェック
       if (data.user) {
         const { data: profile } = await supabase.from("user_profiles").select("is_paid, paid_until").eq("id", data.user.id).single();
         const isPaidUser = profile && profile.is_paid && profile.paid_until && new Date(profile.paid_until) > new Date();
         if (!isPaidUser) {
-          // æªæ±ºæ¸ã¦ã¼ã¶ã¼ â æ±ºæ¸ãã¼ã¸ã¸
+          // 未決済ユーザー → 決済ページへ
           onClose();
           onSignupAndPay(data.session?.access_token);
           setLoading(false);
@@ -86,18 +86,18 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
   };
 
   const handleSignup = async () => {
-    if (!email) { setError("ã¡ã¼ã«ã¢ãã¬ã¹ãå¥åãã¦ãã ãã"); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("æ­£ããã¡ã¼ã«ã¢ãã¬ã¹ãå¥åãã¦ãã ãã"); return; }
+    if (!email) { setError("メールアドレスを入力してください"); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("正しいメールアドレスを入力してください"); return; }
     setLoading(true); setError("");
-    // ã©ã³ãã ãã¹ã¯ã¼ãã§ã¢ã«ã¦ã³ãä½æï¼æ±ºæ¸å¾ã«ãã¹ã¯ã¼ãè¨­å®ã¡ã¼ã«ãéä¿¡ï¼
+    // ランダムパスワードでアカウント作成（決済後にパスワード設定メールを送信）
     const tempPassword = crypto.randomUUID().replace(/-/g, "").slice(0, 16) + "Aa1!";
     const { data, error } = await supabase.auth.signUp({ email, password: tempPassword });
-    if (error) { setError(error.message.includes("already") ? "ãã®ã¡ã¼ã«ã¢ãã¬ã¹ã¯æ¢ã«ç»é²ããã¦ãã¾ããã­ã°ã¤ã³ã¿ãããã­ã°ã¤ã³ãã¦ãã ããã" : "ç»é²ã«å¤±æãã¾ãã"); }
+    if (error) { setError(error.message.includes("already") ? "このメールアドレスは既に登録されています。ログインタブからログインしてください。" : "登録に失敗しました"); }
     else if (data.user && data.user.identities && data.user.identities.length === 0) {
-      setError("ãã®ã¡ã¼ã«ã¢ãã¬ã¹ã¯æ¢ã«ç»é²ããã¦ãã¾ããã­ã°ã¤ã³ã¿ãããã­ã°ã¤ã³ãã¦ãã ããã");
+      setError("このメールアドレスは既に登録されています。ログインタブからログインしてください。");
     }
     else {
-      // ã¢ã«ã¦ã³ãä½ææå â æ±ºæ¸ãã¼ã¸ã¸ç´æ¥é·ç§»
+      // アカウント作成成功 → 決済ページへ直接遷移
       const accessToken = data.session?.access_token;
       onClose();
       onSignupAndPay(accessToken);
@@ -109,45 +109,45 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content auth-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <p className="modal-title">{tab === "login" ? "ã­ã°ã¤ã³" : "ææãã©ã³ç»é²ï¼å¹´é980åï¼"}</p>
-          <button className="modal-close" onClick={onClose}>â</button>
+          <p className="modal-title">{tab === "login" ? "ログイン" : "有料プラン登録（年間980円）"}</p>
+          <button className="modal-close" onClick={onClose}>✕</button>
         </div>
         <div className="modal-body">
           <div className="auth-tabs">
-            <button className={`auth-tab ${tab === "login" ? "active" : ""}`} onClick={() => { setTab("login"); setError(""); }}>ã­ã°ã¤ã³</button>
-            <button className={`auth-tab ${tab === "signup" ? "active" : ""}`} onClick={() => { setTab("signup"); setError(""); }}>æ°è¦ç»é²</button>
+            <button className={`auth-tab ${tab === "login" ? "active" : ""}`} onClick={() => { setTab("login"); setError(""); }}>ログイン</button>
+            <button className={`auth-tab ${tab === "signup" ? "active" : ""}`} onClick={() => { setTab("signup"); setError(""); }}>新規登録</button>
           </div>
           <div className="auth-form">
-            {/* ===== ã­ã°ã¤ã³ã¿ã ===== */}
+            {/* ===== ログインタブ ===== */}
             {tab === "login" && (
               <>
-                <input className="exchange-input" type="email" placeholder="ã¡ã¼ã«ã¢ãã¬ã¹" value={email} onChange={e => setEmail(e.target.value)} />
-                <input className="exchange-input" type="password" placeholder="ãã¹ã¯ã¼ã" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleLogin()} />
+                <input className="exchange-input" type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
+                <input className="exchange-input" type="password" placeholder="パスワード" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleLogin()} />
                 {error && <p className="exchange-error">{error}</p>}
                 <button className="exchange-submit-btn" style={{ width: "100%" }} onClick={handleLogin} disabled={loading}>
-                  {loading ? "å¦çä¸­..." : "ã­ã°ã¤ã³"}
+                  {loading ? "処理中..." : "ログイン"}
                 </button>
               </>
             )}
-            {/* ===== æ°è¦ç»é²: ã¡ã¼ã«ã¢ãã¬ã¹ã®ã¿ â å³æ±ºæ¸ ===== */}
+            {/* ===== 新規登録: メールアドレスのみ → 即決済 ===== */}
             {tab === "signup" && (
               <>
-                <input className="exchange-input" type="email" placeholder="ã¡ã¼ã«ã¢ãã¬ã¹" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSignup()} />
+                <input className="exchange-input" type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSignup()} />
                 {error && <p className="exchange-error">{error}</p>}
                 <button className="exchange-submit-btn" style={{ width: "100%" }} onClick={handleSignup} disabled={loading}>
-                  {loading ? "å¦çä¸­..." : "æ±ºæ¸ã«é²ã"}
+                  {loading ? "処理中..." : "決済に進む"}
                 </button>
               </>
             )}
           </div>
           {tab === "signup" && (
             <p style={{ fontSize: 12, color: "#64748b", textAlign: "center", marginTop: 12 }}>
-              æ±ºæ¸å®äºå¾ããã¹ã¯ã¼ãè¨­å®ã¡ã¼ã«ããéããã¾ã
+              決済完了後、パスワード設定メールをお送りします
             </p>
           )}
           {tab === "login" && (
             <p style={{ fontSize: 12, color: "#94a3b8", textAlign: "center", marginTop: 12 }}>
-              ææãã©ã³ã«ç»é²ããã¨åºåãªãã§ãå©ç¨ããã ãã¾ã
+              有料プランに登録すると広告なしでご利用いただけます
             </p>
           )}
         </div>
@@ -167,23 +167,23 @@ function AdCountdownModal({ onDone }: { onDone: () => void }) {
     return () => clearTimeout(t);
   }, [count]);
 
-  // Google AdSense åºåãèª­ã¿è¾¼ã
+  // Google AdSense 広告を読み込む
   useEffect(() => {
     try {
       if (adRef.current && window.adsbygoogle) {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       }
     } catch (e) {
-      // AdSense ãã¾ã å¯©æ»ä¸­ã®å ´åã¯ã¨ã©ã¼ãç¡è¦
+      // AdSense がまだ審査中の場合はエラーを無視
     }
   }, []);
 
   return (
     <div className="modal-overlay" style={{ zIndex: 200 }}>
       <div className="ad-modal">
-        <p className="ad-modal-label">åºå</p>
+        <p className="ad-modal-label">広告</p>
         <div className="ad-placeholder" ref={adRef}>
-          {/* Google AdSense ãã£ã¹ãã¬ã¤åºå (ã¬ã¹ãã³ã·ã) */}
+          {/* Google AdSense ディスプレイ広告 (レスポンシブ) */}
           <ins className="adsbygoogle"
             style={{ display: "block", width: "100%", minHeight: 250 }}
             data-ad-client="ca-pub-1593750663073581"
@@ -194,14 +194,14 @@ function AdCountdownModal({ onDone }: { onDone: () => void }) {
         </div>
         <div className="ad-countdown-row">
           {count > 0 ? (
-            <span className="ad-countdown-text">{count}ç§å¾ã«ã¹ã­ããã§ãã¾ã</span>
+            <span className="ad-countdown-text">{count}秒後にスキップできます</span>
           ) : (
-            <button className="ad-skip-btn" onClick={onDone}>çµæãè¦ã â</button>
+            <button className="ad-skip-btn" onClick={onDone}>結果を見る →</button>
           )}
         </div>
         <p style={{ fontSize: 11, color: "#94a3b8", textAlign: "center", marginTop: 8 }}>
           <button className="footer-link" style={{ fontSize: 11 }} onClick={onDone}>
-            ææãã©ã³ã«ç»é²ããã¨åºåãªãã§å©ç¨ã§ãã¾ã
+            有料プランに登録すると広告なしで利用できます
           </button>
         </p>
       </div>
@@ -215,7 +215,7 @@ interface ChatMsg { role: "user" | "assistant"; content: string; }
 function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([
-    { role: "assistant", content: "ããã«ã¡ã¯ï¼ä½¿ãæ¹ã®ãè³ªåãä¸å·åã®ãå ±åã¯ãã¡ãããã©ããð" }
+    { role: "assistant", content: "こんにちは！使い方のご質問や不具合のご報告はこちらからどうぞ😊" }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -242,9 +242,9 @@ function ChatWidget() {
         }
       );
       const data = await res.json();
-      setMessages(prev => [...prev, { role: "assistant", content: data.reply || "å¿ç­ãåå¾ã§ãã¾ããã§ããã" }]);
+      setMessages(prev => [...prev, { role: "assistant", content: data.reply || "応答を取得できませんでした。" }]);
     } catch {
-      setMessages(prev => [...prev, { role: "assistant", content: "æ¥ç¶ã¨ã©ã¼ãçºçãã¾ããããã°ããå¾ã£ã¦ããååº¦ãè©¦ããã ããã" }]);
+      setMessages(prev => [...prev, { role: "assistant", content: "接続エラーが発生しました。しばらく待ってから再度お試しください。" }]);
     }
     setLoading(false);
   };
@@ -254,8 +254,8 @@ function ChatWidget() {
       {open && (
         <div className="chat-window">
           <div className="chat-header">
-            <span>ð¬ ãµãã¼ãã»ä¸å·åå ±å</span>
-            <button className="chat-close-btn" onClick={() => setOpen(false)}>â</button>
+            <span>💬 サポート・不具合報告</span>
+            <button className="chat-close-btn" onClick={() => setOpen(false)}>✕</button>
           </div>
           <div className="chat-messages">
             {messages.map((m, i) => (
@@ -265,7 +265,7 @@ function ChatWidget() {
             ))}
             {loading && (
               <div className="chat-bubble assistant">
-                <span className="chat-typing">âââ</span>
+                <span className="chat-typing">●●●</span>
               </div>
             )}
             <div ref={bottomRef} />
@@ -276,17 +276,17 @@ function ChatWidget() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && !e.shiftKey && send()}
-              placeholder="ã¡ãã»ã¼ã¸ãå¥å..."
+              placeholder="メッセージを入力..."
               disabled={loading}
             />
             <button className="chat-send-btn" onClick={send} disabled={loading || !input.trim()}>
-              éä¿¡
+              送信
             </button>
           </div>
         </div>
       )}
-      <button className="chat-fab" onClick={() => setOpen(o => !o)} aria-label="ãµãã¼ããã£ãã">
-        {open ? "â" : "ð¬"}
+      <button className="chat-fab" onClick={() => setOpen(o => !o)} aria-label="サポートチャット">
+        {open ? "✕" : "💬"}
       </button>
     </>
   );
@@ -324,7 +324,7 @@ function ExchangeRequestSection() {
 
   const handleSubmit = async () => {
     if (!newExchange.trim() || !email.trim()) {
-      setSubmitError("åå¼æåã¨ã¡ã¼ã«ã¢ãã¬ã¹ãå¥åãã¦ãã ãã");
+      setSubmitError("取引所名とメールアドレスを入力してください");
       return;
     }
     setSubmitting(true);
@@ -341,7 +341,7 @@ function ExchangeRequestSection() {
       });
       if (!res.ok) {
         const data = await res.json();
-        setSubmitError(data.detail || "éä¿¡ã«å¤±æãã¾ãã");
+        setSubmitError(data.detail || "送信に失敗しました");
       } else {
         setSubmitted(true);
         setNewExchange("");
@@ -350,51 +350,51 @@ function ExchangeRequestSection() {
         fetchExchanges();
       }
     } catch {
-      setSubmitError("éä¿¡ã¨ã©ã¼ãçºçãã¾ããããã°ããå¾ã£ã¦ããååº¦ãè©¦ããã ããã");
+      setSubmitError("通信エラーが発生しました。しばらく待ってから再度お試しください。");
     }
     setSubmitting(false);
   };
 
   return (
     <div className="exchange-request-section">
-      <h3 className="exchange-request-title">ð¦ å¯¾å¿åå¼æã®ãªã¯ã¨ã¹ã</h3>
+      <h3 className="exchange-request-title">🏦 対応取引所のリクエスト</h3>
       <p className="exchange-request-desc">
-        å¸æããåå¼æããªã¯ã¨ã¹ãã§ãã¾ãã<strong>3äºº</strong>ããªã¯ã¨ã¹ãããåå¼æã¯<strong>å¯¾å¿äºå®</strong>ã«è¿½å ããã¾ããåå¼å±¥æ­´CSVãæ·»ä»ãã¦ããã ããã¨å®è£ãã¹ã ã¼ãºã«ãªãã¾ãã
+        希望する取引所をリクエストできます。<strong>3人</strong>がリクエストした取引所は<strong>対応予定</strong>に追加されます。取引履歴CSVを添付していただけると実装がスムーズになります。
       </p>
 
       {submitted ? (
         <div className="exchange-request-success">
-          â ãªã¯ã¨ã¹ããåãä»ãã¾ããï¼ãããã¨ããããã¾ãã
-          <button className="exchange-again-btn" onClick={() => setSubmitted(false)}>å¥ã®åå¼æããªã¯ã¨ã¹ã</button>
+          ✅ リクエストを受け付けました！ありがとうございます。
+          <button className="exchange-again-btn" onClick={() => setSubmitted(false)}>別の取引所もリクエスト</button>
         </div>
       ) : (
         <div className="exchange-request-form">
           <input
             className="exchange-input"
-            placeholder="åå¼æåï¼ä¾ï¼GMOã³ã¤ã³ï¼"
+            placeholder="取引所名（例：GMOコイン）"
             value={newExchange}
             onChange={e => setNewExchange(e.target.value)}
           />
           <input
             className="exchange-input"
             type="email"
-            placeholder="ã¡ã¼ã«ã¢ãã¬ã¹ï¼éè¤æç¥¨é²æ­¢ç¨ã»éå¬éï¼"
+            placeholder="メールアドレス（重複投票防止用・非公開）"
             value={email}
             onChange={e => setEmail(e.target.value)}
           />
-          {/* CSVæ·»ä» */}
+          {/* CSV添付 */}
           <div className="exchange-csv-row">
             <button
               type="button"
               className="exchange-csv-btn"
               onClick={() => csvInputRef.current?.click()}
             >
-              ð åå¼å±¥æ­´CSVãæ·»ä»ï¼ä»»æï¼
+              📎 取引履歴CSVを添付（任意）
             </button>
             {csvFile && (
               <span className="exchange-csv-name">
                 {csvFile.name}
-                <button className="exchange-csv-remove" onClick={() => setCsvFile(null)}>Ã</button>
+                <button className="exchange-csv-remove" onClick={() => setCsvFile(null)}>×</button>
               </span>
             )}
             <input
@@ -407,14 +407,14 @@ function ExchangeRequestSection() {
           </div>
           {submitError && <p className="exchange-error">{submitError}</p>}
           <button className="exchange-submit-btn" onClick={handleSubmit} disabled={submitting}>
-            {submitting ? "éä¿¡ä¸­..." : "ãªã¯ã¨ã¹ããã"}
+            {submitting ? "送信中..." : "リクエストする"}
           </button>
         </div>
       )}
 
       {exchanges.length > 0 && (
         <div className="exchange-votes">
-          <p className="exchange-votes-title">ç¾å¨ã®ãªã¯ã¨ã¹ãç¶æ³</p>
+          <p className="exchange-votes-title">現在のリクエスト状況</p>
           {exchanges.map(ex => (
             <div key={ex.exchange_name} className="exchange-vote-row">
               <span className="exchange-vote-name">{ex.exchange_name}</span>
@@ -428,7 +428,7 @@ function ExchangeRequestSection() {
                 />
               </div>
               <span className="exchange-vote-count">{ex.count}/3</span>
-              {ex.is_official && <span className="exchange-official-badge">å®è£äºå®â</span>}
+              {ex.is_official && <span className="exchange-official-badge">実装予定✓</span>}
             </div>
           ))}
         </div>
@@ -485,9 +485,9 @@ function App() {
   const [cancelLoading, setCancelLoading] = useState(false);
 
   const handleCancelSubscription = async () => {
-    if (!confirm("ææãã©ã³ãè§£ç´ãã¾ããï¼\næå¹æéã¾ã§å¼ãç¶ããå©ç¨ããã ãã¾ãã")) return;
+    if (!confirm("有料プランを解約しますか？\n有効期限まで引き続きご利用いただけます。")) return;
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) { alert("ã­ã°ã¤ã³ãã¦ãã ããã"); return; }
+    if (!session) { alert("ログインしてください。"); return; }
     setCancelLoading(true);
     try {
       const res = await fetch(
@@ -502,12 +502,12 @@ function App() {
       );
       const data = await res.json();
       if (res.ok) {
-        alert(data.message || "è§£ç´ãåãä»ãã¾ããã");
+        alert(data.message || "解約を受け付けました。");
       } else {
-        alert(data.detail || "è§£ç´å¦çã«å¤±æãã¾ããã");
+        alert(data.detail || "解約処理に失敗しました。");
       }
     } catch {
-      alert("ãµã¼ãã¼ã«æ¥ç¶ã§ãã¾ããã§ããã");
+      alert("サーバーに接続できませんでした。");
     }
     setCancelLoading(false);
   };
@@ -535,24 +535,24 @@ function App() {
       if (data.checkout_url) {
         window.location.href = data.checkout_url;
       } else {
-        alert("æ±ºæ¸ãã¼ã¸ã®åå¾ã«å¤±æãã¾ããããã°ããå¾ã£ã¦ããååº¦ãè©¦ããã ããã");
+        alert("決済ページの取得に失敗しました。しばらく待ってから再度お試しください。");
       }
     } catch {
-      alert("ãµã¼ãã¼ã«æ¥ç¶ã§ãã¾ããã§ããã");
+      alert("サーバーに接続できませんでした。");
     }
     setUpgradeLoading(false);
   };
 
-  // æ±ºæ¸å®äºå¾ã®URLãã©ã¡ã¼ã¿å¦ç
+  // 決済完了後のURLパラメータ処理
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("payment") === "success") {
       setPaymentSuccess(true);
       window.history.replaceState({}, "", "/");
-      // ææã¹ãã¼ã¿ã¹ãååå¾
+      // 有料ステータスを再取得
       if (user) {
         fetchPaidStatus(user.id);
-        // ãã¹ã¯ã¼ãè¨­å®ã¡ã¼ã«ãéä¿¡ï¼æ°è¦ç»é²ã¦ã¼ã¶ã¼åãï¼
+        // パスワード設定メールを送信（新規登録ユーザー向け）
         supabase.auth.resetPasswordForEmail(user.email || "", {
           redirectTo: window.location.origin,
         });
@@ -584,7 +584,7 @@ function App() {
 
   const handleSubmit = async () => {
     if (files.length === 0) {
-      setError("CSVãã¡ã¤ã«ã1ã¤ä»¥ä¸é¸æãã¦ãã ãã");
+      setError("CSVファイルを1つ以上選択してください");
       return;
     }
     setLoading(true);
@@ -594,7 +594,7 @@ function App() {
     files.forEach(f => formData.append("files", f));
     formData.append("method", method);
     try {
-      // èªè¨¼ãã¼ã¯ã³ãããã°ãããã¼ã«ä»ä¸ï¼ããã¯ã¨ã³ãã§show_adå¤å®ã«ä½¿ç¨ï¼
+      // 認証トークンがあればヘッダーに付与（バックエンドでshow_ad判定に使用）
       const headers: Record<string, string> = {};
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.access_token) {
@@ -607,29 +607,29 @@ function App() {
       );
       const data = await res.json();
       if (!res.ok) {
-        setError(data.detail || "è¨ç®ä¸­ã«ã¨ã©ã¼ãçºçãã¾ãããCSVã®ãã©ã¼ããããç¢ºèªãã¦ãã ããã");
+        setError(data.detail || "計算中にエラーが発生しました。CSVのフォーマットを確認してください。");
       } else {
-        // ããã¯ã¨ã³ãã®show_adãã©ã°ã§åºåè¡¨ç¤ºãå¤å®
+        // バックエンドのshow_adフラグで広告表示を判定
         if (data.show_ad === false) {
-          // ææã¦ã¼ã¶ã¼ï¼å³åº§ã«çµæè¡¨ç¤º
+          // 有料ユーザー：即座に結果表示
           setResult(data);
           setIsPaid(true);
           setTimeout(() => {
             document.getElementById("result-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
           }, 100);
         } else {
-          // ç¡æã¦ã¼ã¶ã¼ï¼åºåãè¦ã¦ããçµæè¡¨ç¤º
+          // 無料ユーザー：広告を見てから結果表示
           setPendingResult(data);
           setShowAdModal(true);
         }
       }
     } catch {
-      setError("ãµã¼ãã¼ã«æ¥ç¶ã§ãã¾ããã§ããããã°ããå¾ã£ã¦ããååº¦ãè©¦ããã ããã");
+      setError("サーバーに接続できませんでした。しばらく待ってから再度お試しください。");
     }
     setLoading(false);
   };
 
-  // å¹´å¥æçéè¨
+  // 年別損益集計
   const byYear: Record<string, { income: number; cost: number; profit: number }> = {};
   if (result) {
     result.trades.forEach((t: any) => {
@@ -643,10 +643,10 @@ function App() {
 
   const handleCSVDownload = () => {
     if (!isPaid) {
-      alert("åå¼ãã¼ã¿ã®CSVåºåã¯ææãã©ã³ï¼å¹´é980åï¼ã®æ©è½ã§ããã¢ããã°ã¬ã¼ããã¦ãå©ç¨ãã ããã");
+      alert("取引データのCSV出力は有料プラン（年間980円）の機能です。アップグレードしてご利用ください。");
       return;
     }
-    const header = "åå¼æ¥æ,åå¼æ,å£²è²·,éè²¨,æ°é,åä¾¡(å),ææ°æ";
+    const header = "取引日時,取引所,売買,通貨,数量,単価(円),手数料";
     const rows = result.raw_trades.map((t: any) =>
       `${t.datetime},${t.exchange},${t.action},${t.currency},${t.amount},${t.price},${t.fee}`
     );
@@ -655,14 +655,14 @@ function App() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "åå¼ãã¼ã¿.csv";
+    a.download = "取引データ.csv";
     a.click();
     URL.revokeObjectURL(url);
   };
 
   const handlePDFDownload = async () => {
     if (!isPaid) {
-      alert("PDFåºåã¯ææãã©ã³ï¼å¹´é980åï¼ã®æ©è½ã§ããã¢ããã°ã¬ã¼ããã¦ãå©ç¨ãã ããã");
+      alert("PDF出力は有料プラン（年間980円）の機能です。アップグレードしてご利用ください。");
       return;
     }
     if (files.length === 0) return;
@@ -683,7 +683,7 @@ function App() {
       );
       if (!res.ok) {
         const data = await res.json();
-        alert(data.detail || "PDFåºåã«å¤±æãã¾ããã");
+        alert(data.detail || "PDF出力に失敗しました。");
       } else {
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
@@ -694,7 +694,7 @@ function App() {
         URL.revokeObjectURL(url);
       }
     } catch {
-      alert("ãµã¼ãã¼ã«æ¥ç¶ã§ãã¾ããã§ããã");
+      alert("サーバーに接続できませんでした。");
     }
     setLoading(false);
   };
@@ -710,27 +710,27 @@ function App() {
       {/* Header */}
       <header className="app-header">
         <div className="app-header-inner">
-          <div className="app-header-logo">â¿</div>
-          <span className="app-header-title">æå·è³ç£æçè¨ç®ãã¼ã«</span>
-          <span className={`app-header-badge${isPaid ? " badge-premium" : ""}`}>{isPaid ? "Premium" : "ç¡æ"}</span>
+          <div className="app-header-logo">₿</div>
+          <span className="app-header-title">暗号資産損益計算ツール</span>
+          <span className={`app-header-badge${isPaid ? " badge-premium" : ""}`}>{isPaid ? "Premium" : "無料"}</span>
           <div style={{ marginLeft: "auto" }}>
             {user ? (
               <div className="header-user">
-                <span className="header-user-email">{isPaid ? "ð ææãã©ã³" : "ç¡æãã©ã³"}</span>
+                <span className="header-user-email">{isPaid ? "👑 有料プラン" : "無料プラン"}</span>
                 {!isPaid && (
                   <button
                     className="header-upgrade-btn"
                     onClick={() => handleUpgrade()}
                     disabled={upgradeLoading}
                   >
-                    {upgradeLoading ? "å¦çä¸­..." : "â¬ï¸ ã¢ããã°ã¬ã¼ã"}
+                    {upgradeLoading ? "処理中..." : "⬆️ アップグレード"}
                   </button>
                 )}
-                <button className="header-logout-btn" onClick={handleLogout}>ã­ã°ã¢ã¦ã</button>
+                <button className="header-logout-btn" onClick={handleLogout}>ログアウト</button>
               </div>
             ) : (
               <button className="header-login-btn" onClick={() => setShowAuthModal(true)}>
-                ææãã©ã³ã¸ç»é²
+                有料プランへ登録
               </button>
             )}
           </div>
@@ -738,37 +738,37 @@ function App() {
       </header>
 
       <main className="app-container">
-        {/* æ±ºæ¸æåããã¼ */}
+        {/* 決済成功バナー */}
         {paymentSuccess && (
           <div className="payment-success-banner">
-            ð ææãã©ã³ã¸ã®ã¢ããã°ã¬ã¼ããå®äºãã¾ããï¼åºåãªãã§ãå©ç¨ããã ãã¾ãã
-            <button onClick={() => setPaymentSuccess(false)} className="banner-close">â</button>
+            🎉 有料プランへのアップグレードが完了しました！広告なしでご利用いただけます。
+            <button onClick={() => setPaymentSuccess(false)} className="banner-close">✕</button>
           </div>
         )}
 
         {/* Page Title */}
-        <h1 className="page-title">æå·è³ç£ã®æçãããããã·ã¥ãã¬ã¼ã·ã§ã³</h1>
-        <p className="page-subtitle">åå¼å±¥æ­´ã®CSVãã¢ããã­ã¼ãããã¨ãæçãã·ã¥ãã¬ã¼ã·ã§ã³ã§ãã¾ã</p>
-        <p className="page-subtitle-paid">ãªããææãã©ã³ã«ç»é²ããã ãã¨æçè¨ç®çµæCSVãåºåã§ãã¾ããæçè¨ç®çµæCSVãåãè¾¼ãã§æçè¨ç®ãè¡ããã¨ãã§ãã¾ããã¾ããææãã©ã³ã«ã¯åºåãè¡¨ç¤ºãããªããããã¹ãã¬ã¹ããªã¼ã§ä½æ¥­ã§ãã¾ãã</p>
-        <p className="page-exchanges">å¯¾å¿åå¼æï¼Coincheckã»SBI VC Tradeã»bitbank</p>
+        <h1 className="page-title">暗号資産の損益をかんたんシュミレーション</h1>
+        <p className="page-subtitle">取引履歴のCSVをアップロードすると、損益をシュミレーションできます</p>
+        <p className="page-subtitle-paid">なお、有料プランに登録いただくと損益計算結果CSVを出力できます。損益計算結果CSVを取り込んで損益計算を行うことができます。また、有料プランには広告が表示されないため、ストレスフリーで作業できます。</p>
+        <p className="page-exchanges">対応取引所：Coincheck・SBI VC Trade・bitbank</p>
 
-        {/* Step 1: è¨ç®æ¹æ³ */}
+        {/* Step 1: 計算方法 */}
         <div className="card">
-          <label className="card-label" htmlFor="method-select">â  è¨ç®æ¹æ³ãé¸ã¶</label>
+          <label className="card-label" htmlFor="method-select">① 計算方法を選ぶ</label>
           <select
             id="method-select"
             className="method-select"
             value={method}
             onChange={e => setMethod(e.target.value)}
           >
-            <option value="total_average">ç·å¹³åæ³</option>
-            <option value="moving_average">ç§»åå¹³åæ³</option>
+            <option value="total_average">総平均法</option>
+            <option value="moving_average">移動平均法</option>
           </select>
         </div>
 
-        {/* Step 2: ãã¡ã¤ã«ã¢ããã­ã¼ã */}
+        {/* Step 2: ファイルアップロード */}
         <div className="card">
-          <label className="card-label">â¡ CSVãã¡ã¤ã«ãã¢ããã­ã¼ã</label>
+          <label className="card-label">② CSVファイルをアップロード</label>
           <div
             className={`file-drop-area${dragging ? " dragging" : ""}`}
             onClick={() => fileInputRef.current?.click()}
@@ -776,12 +776,12 @@ function App() {
             onDragLeave={() => setDragging(false)}
             onDrop={handleDrop}
           >
-            <div className="file-drop-icon">ð</div>
+            <div className="file-drop-icon">📂</div>
             <p className="file-drop-text">
-              ã¯ãªãã¯ãã¦ãã¡ã¤ã«ãé¸æ<br />
-              ã¾ãã¯ãã©ãã°ï¼ãã­ãã
+              クリックしてファイルを選択<br />
+              またはドラッグ＆ドロップ
             </p>
-            <p className="file-drop-hint">è¤æ°ã®CSVãã¡ã¤ã«ãä¸åº¦ã«é¸æã§ãã¾ã</p>
+            <p className="file-drop-hint">複数のCSVファイルを一度に選択できます</p>
           </div>
           <input
             ref={fileInputRef}
@@ -795,13 +795,13 @@ function App() {
             <ul className="file-list">
               {files.map(f => (
                 <li key={f.name} className="file-list-item">
-                  <span>ð {f.name}</span>
+                  <span>📄 {f.name}</span>
                   <button
                     className="file-remove-btn"
                     onClick={() => removeFile(f.name)}
-                    aria-label={`${f.name}ãåé¤`}
+                    aria-label={`${f.name}を削除`}
                   >
-                    Ã
+                    ×
                   </button>
                 </li>
               ))}
@@ -812,7 +812,7 @@ function App() {
         {/* Error */}
         {error && (
           <div className="error-message">
-            <span>â ï¸</span>
+            <span>⚠️</span>
             <span>{error}</span>
           </div>
         )}
@@ -822,30 +822,30 @@ function App() {
           {loading ? (
             <>
               <span className="spinner" />
-              è¨ç®ä¸­...
+              計算中...
             </>
           ) : (
-            "â¢ æçãè¨ç®ãã"
+            "③ 損益を計算する"
           )}
         </button>
 
         {/* Notice */}
         <div className="notice-box" style={{ marginTop: 16 }}>
-          <p className="notice-box-title">â ï¸ æ³¨æäºé </p>
+          <p className="notice-box-title">⚠️ 注意事項</p>
           <ol>
-            <li>æ¬ãµã¼ãã¹ã®è¨ç®çµæã¯åèå¤ã§ãããå®éã®ç¢ºå®ç³åã®æ ¹æ ã¨ãã¦ãã®ã¾ã¾ä½¿ç¨ãããã¨ã¯ã§ãã¾ããã</li>
-            <li>åå¼åå®¹ã«ãã£ã¦ã¯æ­£ç¢ºãªè¨ç®ãè¡ããªãå ´åãããã¾ããç¨åç³åã«ã¤ãã¦ã¯ç¨åç½²ã¾ãã¯ç¨çå£«ã«ãç¸è«ãã ããã</li>
-            <li>æ¬ãµã¼ãã¹ã®å©ç¨ã«ããçããæå®³ã«ã¤ãã¦ãæ¬ãµã¼ãã¹ã¯ä¸åã®è²¬ä»»ãè² ãã¾ããã</li>
+            <li>本サービスの計算結果は参考値であり、実際の確定申告の根拠としてそのまま使用することはできません。</li>
+            <li>取引内容によっては正確な計算が行えない場合があります。税務申告については税務署または税理士にご相談ください。</li>
+            <li>本サービスの利用により生じた損害について、本サービスは一切の責任を負いません。</li>
           </ol>
         </div>
 
         {/* Affiliate */}
         <div className="affiliate-section">
           <div className="affiliate-header">
-            <p className="affiliate-title">ããããæå·è³ç£åå¼æ</p>
-            <span className="pr-badge">åºåï¼PRï¼</span>
+            <p className="affiliate-title">おすすめ暗号資産取引所</p>
+            <span className="pr-badge">広告（PR）</span>
           </div>
-          <p className="affiliate-disclosure">â»æ¬ã»ã¯ã·ã§ã³ã¯ã¢ãã£ãªã¨ã¤ãåºåãå«ã¿ã¾ããå£åº§éè¨­ã«ããå ±é¬ãåãåãå ´åãããã¾ãã</p>
+          <p className="affiliate-disclosure">※本セクションはアフィリエイト広告を含みます。口座開設により報酬を受け取る場合があります。</p>
           <div className="affiliate-grid">
             <a
               href="COINCHECK_AFFILIATE_URL"
@@ -856,7 +856,7 @@ function App() {
               <div className="affiliate-icon" style={{ backgroundColor: "#00b9ae" }}>C</div>
               <div className="affiliate-info">
                 <div className="affiliate-name">Coincheck</div>
-                <div className="affiliate-desc">å½åæå¤§ç´<br />å£åº§éè¨­ç¡æ</div>
+                <div className="affiliate-desc">国内最大級<br />口座開設無料</div>
               </div>
             </a>
             <a
@@ -868,7 +868,7 @@ function App() {
               <div className="affiliate-icon" style={{ backgroundColor: "#1c2b4b" }}>B</div>
               <div className="affiliate-info">
                 <div className="affiliate-name">bitbank</div>
-                <div className="affiliate-desc">å½åæå¤éè²¨<br />åå®ã®ãã£ã¼ã</div>
+                <div className="affiliate-desc">国内最多通貨<br />充実のチャート</div>
               </div>
             </a>
             <a
@@ -880,7 +880,7 @@ function App() {
               <div className="affiliate-icon" style={{ backgroundColor: "#0057b7", fontSize: 11 }}>SBI</div>
               <div className="affiliate-info">
                 <div className="affiliate-name">SBI VC Trade</div>
-                <div className="affiliate-desc">SBIã°ã«ã¼ã<br />å®å¿ã»ä¿¡é ¼</div>
+                <div className="affiliate-desc">SBIグループ<br />安心・信頼</div>
               </div>
             </a>
           </div>
@@ -892,40 +892,40 @@ function App() {
         {/* Result */}
         {result && (
           <div className="result-section" id="result-section">
-            <h2 className="result-section-title">è¨ç®çµæ</h2>
+            <h2 className="result-section-title">計算結果</h2>
 
             {/* Summary */}
             <div className="result-summary">
-              <p className="result-summary-label">åè¨æç</p>
+              <p className="result-summary-label">合計損益</p>
               <div className="result-grid-header">
                 <span></span>
-                <span style={{ textAlign: "right" }}>åå¥éé¡</span>
-                <span style={{ textAlign: "right" }}>åå¾ä¾¡é¡</span>
-                <span style={{ textAlign: "right" }}>æç</span>
+                <span style={{ textAlign: "right" }}>収入金額</span>
+                <span style={{ textAlign: "right" }}>取得価額</span>
+                <span style={{ textAlign: "right" }}>損益</span>
               </div>
               {Object.entries(byYear).sort().map(([year, v]: [string, any]) => (
                 <div key={year} className="result-grid-row">
-                  <span className="result-year">{year}å¹´</span>
-                  <span className="result-amount">{Math.round(v.income).toLocaleString("ja-JP")} å</span>
-                  <span className="result-amount">{Math.round(v.cost).toLocaleString("ja-JP")} å</span>
+                  <span className="result-year">{year}年</span>
+                  <span className="result-amount">{Math.round(v.income).toLocaleString("ja-JP")} 円</span>
+                  <span className="result-amount">{Math.round(v.cost).toLocaleString("ja-JP")} 円</span>
                   <span className={`result-profit ${v.profit >= 0 ? "positive" : "negative"}`}>
-                    {v.profit >= 0 ? "+" : ""}{Math.round(v.profit).toLocaleString("ja-JP")} å
+                    {v.profit >= 0 ? "+" : ""}{Math.round(v.profit).toLocaleString("ja-JP")} 円
                   </span>
                 </div>
               ))}
               <div className="result-grid-total">
-                <span className="result-total-label">åè¨</span>
+                <span className="result-total-label">合計</span>
                 <span className="result-amount" style={{ fontSize: 14 }}>
-                  {Math.round(result.trades.reduce((s: number, t: any) => s + t.sell_price * t.amount, 0)).toLocaleString("ja-JP")} å
+                  {Math.round(result.trades.reduce((s: number, t: any) => s + t.sell_price * t.amount, 0)).toLocaleString("ja-JP")} 円
                 </span>
                 <span className="result-amount" style={{ fontSize: 14 }}>
-                  {Math.round(result.trades.reduce((s: number, t: any) => s + t.avg_buy_price * t.amount, 0)).toLocaleString("ja-JP")} å
+                  {Math.round(result.trades.reduce((s: number, t: any) => s + t.avg_buy_price * t.amount, 0)).toLocaleString("ja-JP")} 円
                 </span>
                 <span
                   className={`result-total-profit result-profit ${result.total_profit >= 0 ? "positive" : "negative"}`}
                 >
                   {result.total_profit >= 0 ? "+" : ""}
-                  {Math.round(result.total_profit).toLocaleString("ja-JP")} å
+                  {Math.round(result.total_profit).toLocaleString("ja-JP")} 円
                 </span>
               </div>
             </div>
@@ -935,37 +935,37 @@ function App() {
               {isPaid ? (
                 <>
                   <button className="csv-btn" onClick={handleCSVDownload}>
-                    ð¥ åå¼ãã¼ã¿ãCSVã§åºå
+                    📥 取引データをCSVで出力
                   </button>
                   <button className="csv-btn" onClick={handlePDFDownload} disabled={loading}>
-                    ð æçè¨ç®æ¸ãPDFã§åºå
+                    📄 損益計算書をPDFで出力
                   </button>
                 </>
               ) : (
                 <>
                   <button className="csv-btn csv-btn-locked" onClick={() => handleUpgrade()}>
-                    ð åå¼ãã¼ã¿ãCSVã§åºåï¼ææãã©ã³ï¼
+                    🔒 取引データをCSVで出力（有料プラン）
                   </button>
                   <button className="csv-btn csv-btn-locked" onClick={() => handleUpgrade()}>
-                    ð æçè¨ç®æ¸ãPDFã§åºåï¼ææãã©ã³ï¼
+                    🔒 損益計算書をPDFで出力（有料プラン）
                   </button>
                 </>
               )}
             </div>
 
             {/* Table */}
-            <h2 className="result-section-title" style={{ marginTop: 8 }}>åå¼æç´°</h2>
+            <h2 className="result-section-title" style={{ marginTop: 8 }}>取引明細</h2>
             <div className="table-wrapper">
               <table className="result-table">
                 <thead>
                   <tr>
-                    <th>åå¼æ</th>
-                    <th>æ¥æ</th>
-                    <th>éè²¨</th>
-                    <th className="right">æ°é</th>
-                    <th className="right">å£²å´åä¾¡</th>
-                    <th className="right">åå¾åä¾¡</th>
-                    <th className="right">æç</th>
+                    <th>取引所</th>
+                    <th>日時</th>
+                    <th>通貨</th>
+                    <th className="right">数量</th>
+                    <th className="right">売却単価</th>
+                    <th className="right">取得単価</th>
+                    <th className="right">損益</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -994,7 +994,7 @@ function App() {
         <div className="app-footer-inner">
           <div className="footer-links">
             <button className="footer-link" onClick={() => setShowPrivacy(true)}>
-              ãã©ã¤ãã·ã¼ããªã·ã¼ã»åè²¬äºé 
+              プライバシーポリシー・免責事項
             </button>
           </div>
           {user && isPaid && (
@@ -1005,11 +1005,11 @@ function App() {
                 onClick={handleCancelSubscription}
                 disabled={cancelLoading}
               >
-                {cancelLoading ? "å¦çä¸­..." : "ææãã©ã³ãè§£ç´ãã"}
+                {cancelLoading ? "処理中..." : "有料プランを解約する"}
               </button>
             </div>
           )}
-          <p className="footer-copy">Â© 2026 æå·è³ç£æçè¨ç®ãã¼ã«. All rights reserved.</p>
+          <p className="footer-copy">© 2026 暗号資産損益計算ツール. All rights reserved.</p>
         </div>
       </footer>
 
