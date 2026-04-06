@@ -510,6 +510,36 @@ function App() {
     await supabase.auth.signOut();
   };
 
+  const [cancelLoading, setCancelLoading] = useState(false);
+
+  const handleCancelSubscription = async () => {
+    if (!confirm("有料プランを解約しますか？\n有効期限まで引き続きご利用いただけます。")) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { alert("ログインしてください。"); return; }
+    setCancelLoading(true);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/cancel-subscription`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session.access_token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message || "解約を受け付けました。");
+      } else {
+        alert(data.detail || "解約処理に失敗しました。");
+      }
+    } catch {
+      alert("サーバーに接続できませんでした。");
+    }
+    setCancelLoading(false);
+  };
+
   const handleUpgrade = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) { setShowAuthModal(true); return; }
@@ -985,6 +1015,18 @@ function App() {
               プライバシーポリシー・免責事項
             </button>
           </div>
+          {user && isPaid && (
+            <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #e2e8f0" }}>
+              <button
+                className="footer-link"
+                style={{ fontSize: 11, color: "#94a3b8" }}
+                onClick={handleCancelSubscription}
+                disabled={cancelLoading}
+              >
+                {cancelLoading ? "処理中..." : "有料プランを解約する"}
+              </button>
+            </div>
+          )}
           <p className="footer-copy">© 2026 暗号資産損益計算ツール. All rights reserved.</p>
         </div>
       </footer>
