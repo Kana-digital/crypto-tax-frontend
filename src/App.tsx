@@ -54,7 +54,7 @@ function PrivacyModal({ onClose }: { onClose: () => void }) {
 }
 
 // ==================== Auth Modal ====================
-function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void; onSuccess: () => void; onSignupAndPay: () => void }) {
+function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void; onSuccess: () => void; onSignupAndPay: (token?: string) => void }) {
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [signupStep, setSignupStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState("");
@@ -73,9 +73,24 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
   const handleLogin = async () => {
     if (!email || !password) { setError("メールアドレスとパスワードを入力してください"); return; }
     setLoading(true); setError("");
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { setError("メールアドレスまたはパスワードが正しくありません"); }
-    else { onSuccess(); onClose(); }
+    else {
+      // ログイン成功 → 有料会員かチェック
+      if (data.user) {
+        const { data: profile } = await supabase.from("user_profiles").select("is_paid, paid_until").eq("id", data.user.id).single();
+        const isPaidUser = profile && profile.is_paid && profile.paid_until && new Date(profile.paid_until) > new Date();
+        if (!isPaidUser) {
+          // 未決済ユーザー → 決済ページへ
+          onClose();
+          onSignupAndPay(data.session?.access_token);
+          setLoading(false);
+          return;
+        }
+      }
+      onSuccess();
+      onClose();
+    }
     setLoading(false);
   };
 
@@ -97,10 +112,11 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
       setError("このメールアドレスは既に登録されています。ログインタブからログインしてください。");
     }
     else {
-      // アカウント作成成功 → 決済ページへ遷移
+      // アカウント作成成功 → 決済ページへ直接遷移（セッショントークンを渡す）
+      const accessToken = data.session?.access_token;
       onSuccess();
       onClose();
-      onSignupAndPay();
+      onSignupAndPay(accessToken);
     }
     setLoading(false);
   };
@@ -540,9 +556,13 @@ function App() {
     setCancelLoading(false);
   };
 
-  const handleUpgrade = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) { setShowAuthModal(true); return; }
+  const handleUpgrade = async (tokenOverride?: string) => {
+    let token = tokenOverride;
+    if (!token) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { setShowAuthModal(true); return; }
+      token = session.access_token;
+    }
     setUpgradeLoading(true);
     try {
       const res = await fetch(
@@ -551,7 +571,7 @@ function App() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${session.access_token}`,
+            "Authorization": `Bearer ${token}`,
           },
         }
       );
