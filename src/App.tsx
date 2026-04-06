@@ -71,8 +71,11 @@ function AuthModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () 
       if (error) { setError("メールアドレスまたはパスワードが正しくありません"); }
       else { onSuccess(); onClose(); }
     } else {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) { setError(error.message.includes("already") ? "このメールアドレスは既に登録されています" : "登録に失敗しました"); }
+      else if (data.user && data.user.identities && data.user.identities.length === 0) {
+        setError("このメールアドレスは既に登録されています。ログインタブからログインしてください。");
+      }
       else { setSignupDone(true); }
     }
     setLoading(false);
