@@ -56,19 +56,10 @@ function PrivacyModal({ onClose }: { onClose: () => void }) {
 // ==================== Auth Modal ====================
 function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void; onSuccess: () => void; onSignupAndPay: (token?: string) => void }) {
   const [tab, setTab] = useState<"login" | "signup">("login");
-  const [signupStep, setSignupStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const validatePassword = (pw: string): string | null => {
-    if (pw.length < 8) return "パスワードは8文字以上にしてください";
-    if (!/[a-zA-Z]/.test(pw)) return "パスワードに英字を含めてください";
-    if (!/[0-9]/.test(pw)) return "パスワードに数字を含めてください";
-    return null;
-  };
 
   const handleLogin = async () => {
     if (!email || !password) { setError("メールアドレスとパスワードを入力してください"); return; }
@@ -94,49 +85,36 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
     setLoading(false);
   };
 
-  const handleSignupStep1 = () => {
+  const handleSignup = async () => {
     if (!email) { setError("メールアドレスを入力してください"); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("正しいメールアドレスを入力してください"); return; }
-    setError("");
-    setSignupStep(2);
-  };
-
-  const handleSignupStep2 = async () => {
-    const pwError = validatePassword(password);
-    if (pwError) { setError(pwError); return; }
-    if (password !== passwordConfirm) { setError("パスワードが一致しません"); return; }
     setLoading(true); setError("");
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) { setError(error.message.includes("already") ? "このメールアドレスは既に登録されています" : "登録に失敗しました"); }
+    // ランダムパスワードでアカウント作成（決済後にパスワード設定メールを送信）
+    const tempPassword = crypto.randomUUID().replace(/-/g, "").slice(0, 16) + "Aa1!";
+    const { data, error } = await supabase.auth.signUp({ email, password: tempPassword });
+    if (error) { setError(error.message.includes("already") ? "このメールアドレスは既に登録されています。ログインタブからログインしてください。" : "登録に失敗しました"); }
     else if (data.user && data.user.identities && data.user.identities.length === 0) {
       setError("このメールアドレスは既に登録されています。ログインタブからログインしてください。");
     }
     else {
-      // アカウント作成成功 → 決済ページへ直接遷移（セッショントークンを渡す）
+      // アカウント作成成功 → 決済ページへ直接遷移
       const accessToken = data.session?.access_token;
-      onSuccess();
       onClose();
       onSignupAndPay(accessToken);
     }
     setLoading(false);
   };
 
-  const modalTitle = tab === "login"
-    ? "ログイン"
-    : signupStep === 1
-      ? "有料プラン登録（年間980円）"
-      : "パスワード設定";
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content auth-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <p className="modal-title">{modalTitle}</p>
+          <p className="modal-title">{tab === "login" ? "ログイン" : "有料プラン登録（年間980円）"}</p>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
         <div className="modal-body">
           <div className="auth-tabs">
-            <button className={`auth-tab ${tab === "login" ? "active" : ""}`} onClick={() => { setTab("login"); setSignupStep(1); setError(""); }}>ログイン</button>
+            <button className={`auth-tab ${tab === "login" ? "active" : ""}`} onClick={() => { setTab("login"); setError(""); }}>ログイン</button>
             <button className={`auth-tab ${tab === "signup" ? "active" : ""}`} onClick={() => { setTab("signup"); setError(""); }}>新規登録</button>
           </div>
           <div className="auth-form">
@@ -151,42 +129,20 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
                 </button>
               </>
             )}
-            {/* ===== 新規登録 ステップ1: メールアドレスのみ ===== */}
-            {tab === "signup" && signupStep === 1 && (
+            {/* ===== 新規登録: メールアドレスのみ → 即決済 ===== */}
+            {tab === "signup" && (
               <>
-                <input className="exchange-input" type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSignupStep1()} />
+                <input className="exchange-input" type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSignup()} />
                 {error && <p className="exchange-error">{error}</p>}
-                <button className="exchange-submit-btn" style={{ width: "100%" }} onClick={handleSignupStep1}>
-                  次へ
+                <button className="exchange-submit-btn" style={{ width: "100%" }} onClick={handleSignup} disabled={loading}>
+                  {loading ? "処理中..." : "決済に進む"}
                 </button>
               </>
             )}
-            {/* ===== 新規登録 ステップ2: パスワード設定 ===== */}
-            {tab === "signup" && signupStep === 2 && (
-              <>
-                <p style={{ fontSize: 13, color: "#64748b", marginBottom: 8 }}>{email}</p>
-                <input className="exchange-input" type="password" placeholder="パスワード（英数字8文字以上）" value={password} onChange={e => setPassword(e.target.value)} />
-                <input className="exchange-input" type="password" placeholder="パスワード（確認用）" value={passwordConfirm} onChange={e => setPasswordConfirm(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSignupStep2()} />
-                {error && <p className="exchange-error">{error}</p>}
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button className="exchange-submit-btn" style={{ flex: 1, background: "#e2e8f0", color: "#475569" }} onClick={() => { setSignupStep(1); setError(""); }}>
-                    戻る
-                  </button>
-                  <button className="exchange-submit-btn" style={{ flex: 2 }} onClick={handleSignupStep2} disabled={loading}>
-                    {loading ? "処理中..." : "決済に進む"}
-                  </button>
-                </div>
-              </>
-            )}
           </div>
-          {tab === "signup" && signupStep === 1 && (
+          {tab === "signup" && (
             <p style={{ fontSize: 12, color: "#64748b", textAlign: "center", marginTop: 12 }}>
-              次のステップでパスワード設定と決済を行います
-            </p>
-          )}
-          {tab === "signup" && signupStep === 2 && (
-            <p style={{ fontSize: 12, color: "#64748b", textAlign: "center", marginTop: 12 }}>
-              パスワード設定後、決済ページに移動します
+              決済完了後、パスワード設定メールをお送りします
             </p>
           )}
           {tab === "login" && (
@@ -594,7 +550,13 @@ function App() {
       setPaymentSuccess(true);
       window.history.replaceState({}, "", "/");
       // 有料ステータスを再取得
-      if (user) fetchPaidStatus(user.id);
+      if (user) {
+        fetchPaidStatus(user.id);
+        // パスワード設定メールを送信（新規登録ユーザー向け）
+        supabase.auth.resetPasswordForEmail(user.email || "", {
+          redirectTo: window.location.origin,
+        });
+      }
     }
   }, [user]);
 
