@@ -2,6 +2,13 @@ import { useState, useRef, useEffect } from "react";
 import "./App.css";
 import { createClient, type User } from "@supabase/supabase-js";
 
+// Google AdSense の型定義
+declare global {
+  interface Window {
+    adsbygoogle: unknown[];
+  }
+}
+
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL as string,
   import.meta.env.VITE_SUPABASE_ANON_KEY as string
@@ -112,6 +119,7 @@ function AuthModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () 
 // ==================== Ad Countdown Modal ====================
 function AdCountdownModal({ onDone }: { onDone: () => void }) {
   const [count, setCount] = useState(10);
+  const adRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (count <= 0) { onDone(); return; }
@@ -119,13 +127,30 @@ function AdCountdownModal({ onDone }: { onDone: () => void }) {
     return () => clearTimeout(t);
   }, [count]);
 
+  // Google AdSense 広告を読み込む
+  useEffect(() => {
+    try {
+      if (adRef.current && window.adsbygoogle) {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      }
+    } catch (e) {
+      // AdSense がまだ審査中の場合はエラーを無視
+    }
+  }, []);
+
   return (
     <div className="modal-overlay" style={{ zIndex: 200 }}>
       <div className="ad-modal">
         <p className="ad-modal-label">広告</p>
-        <div className="ad-placeholder">
-          {/* Google AdSense 広告ユニットをここに配置予定 */}
-          <p style={{ color: "#94a3b8", fontSize: 13 }}>広告スペース</p>
+        <div className="ad-placeholder" ref={adRef}>
+          {/* Google AdSense ディスプレイ広告 (レスポンシブ) */}
+          <ins className="adsbygoogle"
+            style={{ display: "block", width: "100%", minHeight: 250 }}
+            data-ad-client="ca-pub-1593750663073581"
+            data-ad-slot="auto"
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+          />
         </div>
         <div className="ad-countdown-row">
           {count > 0 ? (
