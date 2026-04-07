@@ -176,7 +176,7 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
                     <p style={{ fontSize: 18, fontWeight: 700, color: "#16a34a", marginBottom: 8 }}>✅ 確認メールを送信しました</p>
                     <p style={{ fontSize: 14, color: "#475569", lineHeight: 1.7 }}>
                       <strong>{email}</strong> 宛にメールを送信しました。<br />
-                      メール内のリンクから、お支払いとパスワード設定を行ってください。
+                      メール内のリンクからお支払いを完了すると、パスワード設定メールが届きます。
                     </p>
                     <p style={{ fontSize: 12, color: "#94a3b8", marginTop: 12 }}>メールが届かない場合は、迷惑メールフォルダをご確認ください。</p>
                   </div>
@@ -194,7 +194,7 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
           </div>
           {tab === "signup" && !signupDone && (
             <p style={{ fontSize: 12, color: "#64748b", textAlign: "center", marginTop: 12 }}>
-              メールアドレスに決済リンクとパスワード設定リンクをお送りします
+              メールアドレスに決済リンクをお送りします
             </p>
           )}
           {tab === "login" && (
