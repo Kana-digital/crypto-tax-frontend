@@ -599,6 +599,7 @@ function App() {
   // Auth
   const [user, setUser] = useState<User | null>(null);
   const [isPaid, setIsPaid] = useState(false);
+  const [paidUntil, setPaidUntil] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showAdModal, setShowAdModal] = useState(false);
   const [pendingResult, setPendingResult] = useState<any>(null);
@@ -628,6 +629,7 @@ function App() {
     if (data) {
       const validUntil = data.paid_until ? new Date(data.paid_until) > new Date() : false;
       setIsPaid(data.is_paid && validUntil);
+      setPaidUntil(data.paid_until || null);
     }
   };
 
@@ -653,14 +655,19 @@ function App() {
           },
         }
       );
-      const data = await res.json();
       if (res.ok) {
+        const data = await res.json();
         alert(data.message || "解約を受け付けました。");
       } else {
-        alert(data.detail || "解約処理に失敗しました。");
+        try {
+          const data = await res.json();
+          alert(data.detail || "解約処理に失敗しました。");
+        } catch {
+          alert(`解約処理に失敗しました。(${res.status})`);
+        }
       }
     } catch {
-      alert("サーバーに接続できませんでした。");
+      alert("サーバーに接続できませんでした。しばらく待ってから再度お試しください。");
     }
     setCancelLoading(false);
   };
@@ -875,7 +882,7 @@ function App() {
           <div style={{ marginLeft: "auto" }}>
             {user ? (
               <div className="header-user">
-                <span className="header-user-email">{isPaid ? "👑 有料プラン" : "無料プラン"}</span>
+                <span className="header-user-email">{isPaid ? `👑 有料プラン${paidUntil ? `（${new Date(paidUntil).toLocaleDateString("ja-JP")}まで）` : ""}` : "無料プラン"}</span>
                 {!isPaid && (
                   <button
                     className="header-upgrade-btn"
