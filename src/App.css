@@ -952,6 +952,48 @@
 .chat-escalate-btn:hover:not(:disabled) { background: #fde68a; }
 .chat-escalate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* Chat Ad Styles */
+.chat-ad-container {
+  margin: 8px 0;
+  padding: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  text-align: center;
+}
+.chat-ad-label {
+  font-size: 10px;
+  color: #94a3b8;
+  margin: 0 0 6px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.chat-ad-slot {
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+.chat-ad-countdown {
+  font-size: 12px;
+  color: #64748b;
+  margin: 4px 0 0 0;
+}
+.chat-ad-skip {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.chat-ad-skip:hover { background: #1d4ed8; }
+
 @media (max-width: 400px) {
   .chat-window {
     right: 8px;

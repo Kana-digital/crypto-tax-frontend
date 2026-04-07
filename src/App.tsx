@@ -306,7 +306,7 @@ function AdCountdownModal({ onDone }: { onDone: () => void }) {
 // ==================== Chat Support Widget ====================
 interface ChatMsg { role: "user" | "assistant"; content: string; }
 
-function ChatWidget() {
+function ChatWidget({ isPaid }: { isPaid: boolean }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([
     { role: "assistant", content: "こんにちは！使い方のご質問や不具合のご報告はこちらからどうぞ😊" }
@@ -314,11 +314,26 @@ function ChatWidget() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [escalated, setEscalated] = useState(false);
+  const [showChatAd, setShowChatAd] = useState(false);
+  const [chatAdCount, setChatAdCount] = useState(0);
+  const [pendingReply, setPendingReply] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const chatAdRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (open) bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, open]);
+
+  // チャット内広告をロード
+  useEffect(() => {
+    if (showChatAd && chatAdRef.current) {
+      try {
+        if (window.adsbygoogle) {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        }
+      } catch { /* AdSense 審査中の場合は無視 */ }
+    }
+  }, [showChatAd]);
 
   const send = async () => {
     const text = input.trim();
@@ -338,7 +353,15 @@ function ChatWidget() {
       );
       const data = await res.json();
       if (res.ok) {
-        setMessages(prev => [...prev, { role: "assistant", content: data.reply || "応答を取得できませんでした。" }]);
+        const reply = data.reply || "応答を取得できませんでした。";
+        // 無料ユーザーは2回目の質問以降、回答前に広告を表示
+        if (!isPaid && newMessages.filter(m => m.role === "user").length >= 2) {
+          setPendingReply(reply);
+          setShowChatAd(true);
+          setChatAdCount(5);
+        } else {
+          setMessages(prev => [...prev, { role: "assistant", content: reply }]);
+        }
       } else {
         console.error("[Chat] Server error:", data);
         setMessages(prev => [...prev, { role: "assistant", content: data.detail || "サーバーエラーが発生しました。しばらく待ってから再度お試しください。" }]);
@@ -347,6 +370,21 @@ function ChatWidget() {
       setMessages(prev => [...prev, { role: "assistant", content: "接続エラーが発生しました。しばらく待ってから再度お試しください。" }]);
     }
     setLoading(false);
+  };
+
+  // 広告カウントダウン
+  useEffect(() => {
+    if (!showChatAd || chatAdCount <= 0) return;
+    const t = setTimeout(() => setChatAdCount(c => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [showChatAd, chatAdCount]);
+
+  const dismissChatAd = () => {
+    setShowChatAd(false);
+    if (pendingReply) {
+      setMessages(prev => [...prev, { role: "assistant", content: pendingReply }]);
+      setPendingReply(null);
+    }
   };
 
   const escalate = async () => {
@@ -399,6 +437,25 @@ function ChatWidget() {
             {loading && (
               <div className="chat-bubble assistant">
                 <span className="chat-typing">●●●</span>
+              </div>
+            )}
+            {showChatAd && (
+              <div className="chat-ad-container">
+                <p className="chat-ad-label">広告</p>
+                <div className="chat-ad-slot" ref={chatAdRef}>
+                  <ins className="adsbygoogle"
+                    style={{ display: "block", width: "100%", minHeight: 100 }}
+                    data-ad-client="ca-pub-1593750663073581"
+                    data-ad-slot="auto"
+                    data-ad-format="auto"
+                    data-full-width-responsive="true"
+                  />
+                </div>
+                {chatAdCount > 0 ? (
+                  <p className="chat-ad-countdown">{chatAdCount}秒後に回答を表示</p>
+                ) : (
+                  <button className="chat-ad-skip" onClick={dismissChatAd}>回答を表示 →</button>
+                )}
               </div>
             )}
             <div ref={bottomRef} />
@@ -1261,7 +1318,7 @@ function App() {
       )}
 
       {/* Chat Support Widget */}
-      <ChatWidget />
+      <ChatWidget isPaid={isPaid} />
     </div>
   );
 }
