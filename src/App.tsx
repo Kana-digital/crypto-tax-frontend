@@ -101,22 +101,29 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
     setLoading(false);
   };
 
+  const [signupDone, setSignupDone] = useState(false);
+
   const handleSignup = async () => {
     if (!email) { setError("メールアドレスを入力してください"); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("正しいメールアドレスを入力してください"); return; }
     setLoading(true); setError("");
-    // ランダムパスワードでアカウント作成（決済後にパスワード設定メールを送信）
-    const tempPassword = crypto.randomUUID().replace(/-/g, "").slice(0, 16) + "Aa1!";
-    const { data, error } = await supabase.auth.signUp({ email, password: tempPassword });
-    if (error) { setError(error.message.includes("already") ? "このメールアドレスは既に登録されています。ログインタブからログインしてください。" : "登録に失敗しました"); }
-    else if (data.user && data.user.identities && data.user.identities.length === 0) {
-      setError("このメールアドレスは既に登録されています。ログインタブからログインしてください。");
-    }
-    else {
-      // アカウント作成成功 → 決済ページへ直接遷移
-      const accessToken = data.session?.access_token;
-      onClose();
-      onSignupAndPay(accessToken);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.detail || "登録に失敗しました");
+      } else {
+        setSignupDone(true);
+      }
+    } catch {
+      setError("サーバーに接続できませんでした。しばらく待ってから再度お試しください。");
     }
     setLoading(false);
   };
@@ -155,20 +162,33 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
                 </p>
               </>
             )}
-            {/* ===== 新規登録: メールアドレスのみ → 即決済 ===== */}
+            {/* ===== 新規登録: メールアドレス入力 → 確認メール送信 ===== */}
             {tab === "signup" && (
               <>
-                <input className="exchange-input" type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSignup()} />
-                {error && <p className="exchange-error">{error}</p>}
-                <button className="exchange-submit-btn" style={{ width: "100%" }} onClick={handleSignup} disabled={loading}>
-                  {loading ? "処理中..." : "決済に進む"}
-                </button>
+                {signupDone ? (
+                  <div style={{ textAlign: "center", padding: "16px 0" }}>
+                    <p style={{ fontSize: 18, fontWeight: 700, color: "#16a34a", marginBottom: 8 }}>✅ 確認メールを送信しました</p>
+                    <p style={{ fontSize: 14, color: "#475569", lineHeight: 1.7 }}>
+                      <strong>{email}</strong> 宛にメールを送信しました。<br />
+                      メール内のリンクから、お支払いとパスワード設定を行ってください。
+                    </p>
+                    <p style={{ fontSize: 12, color: "#94a3b8", marginTop: 12 }}>メールが届かない場合は、迷惑メールフォルダをご確認ください。</p>
+                  </div>
+                ) : (
+                  <>
+                    <input className="exchange-input" type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSignup()} />
+                    {error && <p className="exchange-error">{error}</p>}
+                    <button className="exchange-submit-btn" style={{ width: "100%" }} onClick={handleSignup} disabled={loading}>
+                      {loading ? "処理中..." : "登録する（確認メールを送信）"}
+                    </button>
+                  </>
+                )}
               </>
             )}
           </div>
-          {tab === "signup" && (
+          {tab === "signup" && !signupDone && (
             <p style={{ fontSize: 12, color: "#64748b", textAlign: "center", marginTop: 12 }}>
-              決済完了後、パスワード設定メールをお送りします
+              メールアドレスに決済リンクとパスワード設定リンクをお送りします
             </p>
           )}
           {tab === "login" && (
