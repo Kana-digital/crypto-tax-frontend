@@ -66,13 +66,19 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
   const handleForgotPassword = async () => {
     if (!email) { setError("パスワードリセット用のメールアドレスを入力してください"); return; }
     setResetLoading(true); setError("");
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin,
-    });
-    if (error) {
-      setError("パスワードリセットメールの送信に失敗しました。しばらく待ってから再度お試しください。");
-    } else {
-      setResetSent(true);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/forgot-password`,
+        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.detail || "メール送信に失敗しました。");
+      } else {
+        setResetSent(true);
+      }
+    } catch {
+      setError("サーバーに接続できませんでした。しばらく待ってから再度お試しください。");
     }
     setResetLoading(false);
   };
