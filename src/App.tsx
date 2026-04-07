@@ -337,7 +337,12 @@ function ChatWidget() {
         }
       );
       const data = await res.json();
-      setMessages(prev => [...prev, { role: "assistant", content: data.reply || "応答を取得できませんでした。" }]);
+      if (res.ok) {
+        setMessages(prev => [...prev, { role: "assistant", content: data.reply || "応答を取得できませんでした。" }]);
+      } else {
+        console.error("[Chat] Server error:", data);
+        setMessages(prev => [...prev, { role: "assistant", content: data.detail || "サーバーエラーが発生しました。しばらく待ってから再度お試しください。" }]);
+      }
     } catch {
       setMessages(prev => [...prev, { role: "assistant", content: "接続エラーが発生しました。しばらく待ってから再度お試しください。" }]);
     }
