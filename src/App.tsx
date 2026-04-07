@@ -62,6 +62,7 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
   const [error, setError] = useState("");
   const [resetSent, setResetSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
+  const [showResetForm, setShowResetForm] = useState(false);
 
   const handleForgotPassword = async () => {
     if (!email) { setError("パスワードリセット用のメールアドレスを入力してください"); return; }
@@ -138,34 +139,75 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content auth-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <p className="modal-title">{tab === "login" ? "ログイン" : "有料プラン登録（年間980円）"}</p>
+          <p className="modal-title">{tab === "login" ? (showResetForm ? "パスワード再設定" : "ログイン") : "有料プラン登録（年間980円）"}</p>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
         <div className="modal-body">
+          {!showResetForm && (
           <div className="auth-tabs">
             <button className={`auth-tab ${tab === "login" ? "active" : ""}`} onClick={() => { setTab("login"); setError(""); }}>ログイン</button>
             <button className={`auth-tab ${tab === "signup" ? "active" : ""}`} onClick={() => { setTab("signup"); setError(""); }}>新規登録</button>
           </div>
+          )}
           <div className="auth-form">
             {/* ===== ログインタブ ===== */}
-            {tab === "login" && (
+            {tab === "login" && !showResetForm && (
               <>
                 <input className="exchange-input" type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
                 <input className="exchange-input" type="password" placeholder="パスワード" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleLogin()} />
                 {error && <p className="exchange-error">{error}</p>}
-                {resetSent && <p style={{ fontSize: 13, color: "#16a34a", textAlign: "center" }}>パスワードリセットメールを送信しました。メールをご確認ください。</p>}
                 <button className="exchange-submit-btn" style={{ width: "100%" }} onClick={handleLogin} disabled={loading}>
                   {loading ? "処理中..." : "ログイン"}
                 </button>
                 <p style={{ fontSize: 12, color: "#94a3b8", textAlign: "center", marginTop: 8 }}>
                   <button
-                    onClick={handleForgotPassword}
-                    disabled={resetLoading}
+                    onClick={() => { setShowResetForm(true); setError(""); setResetSent(false); }}
                     style={{ background: "none", border: "none", color: "#2563eb", cursor: "pointer", fontSize: 12, textDecoration: "underline", padding: 0 }}
                   >
-                    {resetLoading ? "送信中..." : "パスワードを忘れた場合"}
+                    パスワードを忘れた場合
                   </button>
                 </p>
+              </>
+            )}
+            {/* ===== パスワードリセット画面 ===== */}
+            {tab === "login" && showResetForm && (
+              <>
+                {resetSent ? (
+                  <div style={{ textAlign: "center", padding: "16px 0" }}>
+                    <p style={{ fontSize: 18, fontWeight: 700, color: "#16a34a", marginBottom: 8 }}>再設定メールを送信しました</p>
+                    <p style={{ fontSize: 14, color: "#475569", lineHeight: 1.7 }}>
+                      <strong>{email}</strong> 宛にパスワード再設定メールを送信しました。<br />
+                      メール内のリンクから新しいパスワードを設定してください。
+                    </p>
+                    <p style={{ fontSize: 12, color: "#94a3b8", marginTop: 12 }}>メールが届かない場合は、迷惑メールフォルダをご確認ください。</p>
+                    <button
+                      className="exchange-submit-btn"
+                      style={{ width: "100%", marginTop: 16, background: "#64748b" }}
+                      onClick={() => { setShowResetForm(false); setResetSent(false); setError(""); }}
+                    >
+                      ログインに戻る
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <p style={{ fontSize: 14, color: "#475569", marginBottom: 12, lineHeight: 1.6 }}>
+                      登録済みのメールアドレスを入力してください。<br />パスワード再設定用のリンクをお送りします。
+                    </p>
+                    <input className="exchange-input" type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === "Enter" && handleForgotPassword()} />
+                    {error && <p className="exchange-error">{error}</p>}
+                    <button className="exchange-submit-btn" style={{ width: "100%" }} onClick={handleForgotPassword} disabled={resetLoading}>
+                      {resetLoading ? "送信中..." : "再設定メールを送信"}
+                    </button>
+                    <p style={{ fontSize: 12, color: "#94a3b8", textAlign: "center", marginTop: 8 }}>
+                      <button
+                        onClick={() => { setShowResetForm(false); setError(""); }}
+                        style={{ background: "none", border: "none", color: "#2563eb", cursor: "pointer", fontSize: 12, textDecoration: "underline", padding: 0 }}
+                      >
+                        ログインに戻る
+                      </button>
+                    </p>
+                  </>
+                )}
               </>
             )}
             {/* ===== 新規登録: メールアドレス入力 → 確認メール送信 ===== */}
