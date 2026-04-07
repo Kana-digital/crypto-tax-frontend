@@ -60,6 +60,22 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [resetSent, setResetSent] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+
+  const handleForgotPassword = async () => {
+    if (!email) { setError("パスワードリセット用のメールアドレスを入力してください"); return; }
+    setResetLoading(true); setError("");
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin,
+    });
+    if (error) {
+      setError("パスワードリセットメールの送信に失敗しました。しばらく待ってから再度お試しください。");
+    } else {
+      setResetSent(true);
+    }
+    setResetLoading(false);
+  };
 
   const handleLogin = async () => {
     if (!email || !password) { setError("メールアドレスとパスワードを入力してください"); return; }
@@ -124,9 +140,19 @@ function AuthModal({ onClose, onSuccess, onSignupAndPay }: { onClose: () => void
                 <input className="exchange-input" type="email" placeholder="メールアドレス" value={email} onChange={e => setEmail(e.target.value)} />
                 <input className="exchange-input" type="password" placeholder="パスワード" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleLogin()} />
                 {error && <p className="exchange-error">{error}</p>}
+                {resetSent && <p style={{ fontSize: 13, color: "#16a34a", textAlign: "center" }}>パスワードリセットメールを送信しました。メールをご確認ください。</p>}
                 <button className="exchange-submit-btn" style={{ width: "100%" }} onClick={handleLogin} disabled={loading}>
                   {loading ? "処理中..." : "ログイン"}
                 </button>
+                <p style={{ fontSize: 12, color: "#94a3b8", textAlign: "center", marginTop: 8 }}>
+                  <button
+                    onClick={handleForgotPassword}
+                    disabled={resetLoading}
+                    style={{ background: "none", border: "none", color: "#2563eb", cursor: "pointer", fontSize: 12, textDecoration: "underline", padding: 0 }}
+                  >
+                    {resetLoading ? "送信中..." : "パスワードを忘れた場合"}
+                  </button>
+                </p>
               </>
             )}
             {/* ===== 新規登録: メールアドレスのみ → 即決済 ===== */}
@@ -437,6 +463,60 @@ function ExchangeRequestSection() {
   );
 }
 
+// ==================== Password Reset Modal ====================
+function PasswordResetModal({ onClose }: { onClose: () => void }) {
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  const handleReset = async () => {
+    if (!newPassword) { setError("新しいパスワードを入力してください"); return; }
+    if (newPassword.length < 8) { setError("パスワードは8文字以上にしてください"); return; }
+    if (newPassword !== confirmPassword) { setError("パスワードが一致しません"); return; }
+    setLoading(true); setError("");
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      setError("パスワードの更新に失敗しました。リンクの有効期限が切れている可能性があります。");
+    } else {
+      setSuccess(true);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content auth-modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <p className="modal-title">パスワード設定</p>
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </div>
+        <div className="modal-body">
+          {success ? (
+            <div style={{ textAlign: "center", padding: "20px 0" }}>
+              <p style={{ fontSize: 16, color: "#16a34a", fontWeight: 600, marginBottom: 12 }}>パスワードを設定しました</p>
+              <p style={{ fontSize: 13, color: "#64748b" }}>このままサービスをご利用いただけます。</p>
+              <button className="exchange-submit-btn" style={{ width: "100%", marginTop: 16 }} onClick={onClose}>
+                閉じる
+              </button>
+            </div>
+          ) : (
+            <div className="auth-form">
+              <input className="exchange-input" type="password" placeholder="新しいパスワード（8文字以上）" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
+              <input className="exchange-input" type="password" placeholder="パスワード（確認）" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleReset()} />
+              {error && <p className="exchange-error">{error}</p>}
+              <button className="exchange-submit-btn" style={{ width: "100%" }} onClick={handleReset} disabled={loading}>
+                {loading ? "処理中..." : "パスワードを設定"}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ==================== Main App ====================
 function App() {
   const [method, setMethod] = useState("total_average");
@@ -456,16 +536,21 @@ function App() {
   const [pendingResult, setPendingResult] = useState<any>(null);
   const [upgradeLoading, setUpgradeLoading] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) fetchPaidStatus(session.user.id);
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) fetchPaidStatus(session.user.id);
       else setIsPaid(false);
+      // パスワードリセットリンクからのリダイレクトを検知
+      if (event === "PASSWORD_RECOVERY") {
+        setShowPasswordReset(true);
+      }
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -555,6 +640,12 @@ function App() {
         // パスワード設定メールを送信（新規登録ユーザー向け）
         supabase.auth.resetPasswordForEmail(user.email || "", {
           redirectTo: window.location.origin,
+        }).then(({ error }) => {
+          if (error) {
+            console.error("パスワード設定メール送信失敗:", error.message);
+          } else {
+            console.log("パスワード設定メール送信成功:", user.email);
+          }
         });
       }
     }
@@ -730,7 +821,7 @@ function App() {
               </div>
             ) : (
               <button className="header-login-btn" onClick={() => setShowAuthModal(true)}>
-                有料プランへ登録
+                有料プランにログイン / 新規登録
               </button>
             )}
           </div>
@@ -1023,6 +1114,11 @@ function App() {
           onSuccess={() => setShowAuthModal(false)}
           onSignupAndPay={handleUpgrade}
         />
+      )}
+
+      {/* Password Reset Modal */}
+      {showPasswordReset && (
+        <PasswordResetModal onClose={() => setShowPasswordReset(false)} />
       )}
 
       {/* Ad Countdown Modal */}
