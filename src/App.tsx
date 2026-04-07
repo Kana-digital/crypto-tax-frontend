@@ -313,6 +313,7 @@ function ChatWidget() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [escalated, setEscalated] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -343,6 +344,39 @@ function ChatWidget() {
     setLoading(false);
   };
 
+  const escalate = async () => {
+    if (escalated || messages.length < 2) return;
+    setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userEmail = session?.user?.email || null;
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/escalate`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: messages,
+            user_email: userEmail,
+            category: "chat_escalation",
+          }),
+        }
+      );
+      const data = await res.json();
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: data.message || "開発者に報告しました。ご連絡ありがとうございます。"
+      }]);
+      setEscalated(true);
+    } catch {
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: "送信に失敗しました。しばらく待ってから再度お試しください。"
+      }]);
+    }
+    setLoading(false);
+  };
+
   return (
     <>
       {open && (
@@ -364,6 +398,17 @@ function ChatWidget() {
             )}
             <div ref={bottomRef} />
           </div>
+          {!escalated && messages.length >= 3 && (
+            <div className="chat-escalate-row">
+              <button
+                className="chat-escalate-btn"
+                onClick={escalate}
+                disabled={loading}
+              >
+                📩 解決しない場合：開発者に連絡
+              </button>
+            </div>
+          )}
           <div className="chat-input-row">
             <input
               className="chat-input"

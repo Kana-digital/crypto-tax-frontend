@@ -934,6 +934,24 @@
 .chat-send-btn:hover:not(:disabled) { background: #1d4ed8; }
 .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+.chat-escalate-row {
+  padding: 4px 12px 0;
+  text-align: center;
+}
+.chat-escalate-btn {
+  width: 100%;
+  padding: 8px 12px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fbbf24;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.chat-escalate-btn:hover:not(:disabled) { background: #fde68a; }
+.chat-escalate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
 @media (max-width: 400px) {
   .chat-window {
     right: 8px;
