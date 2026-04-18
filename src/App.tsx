@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./App.css";
 import { createClient, type User } from "@supabase/supabase-js";
 
@@ -986,6 +987,9 @@ function App() {
           <div className="app-header-logo">₿</div>
           <span className="app-header-title">暗号資産損益計算ツール</span>
           <span className={`app-header-badge${isPaid ? " badge-premium" : ""}`}>{isPaid ? "Premium" : "無料"}</span>
+          <Link to="/articles" style={{ fontSize: 13, color: "#64748b", textDecoration: "none", marginLeft: 8, fontWeight: 500, flexShrink: 0 }}>
+            コラム
+          </Link>
           <div style={{ marginLeft: "auto" }}>
             {user ? (
               <div className="header-user">
@@ -1269,6 +1273,9 @@ function App() {
             <button className="footer-link" onClick={() => setShowPrivacy(true)}>
               プライバシーポリシー・免責事項
             </button>
+            <Link to="/articles" className="footer-link" style={{ textDecoration: "none", marginLeft: 12 }}>
+              コラム
+            </Link>
           </div>
           {user && isPaid && (
             <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #e2e8f0" }}>
